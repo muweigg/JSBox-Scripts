@@ -1,4 +1,6 @@
-const link = $clipboard.link, host = 'http://www.clipconverter.cc';
+const link = $clipboard.link,
+    host = 'http://www.clipconverter.cc',
+    versionCheckUrl = 'https://raw.githubusercontent.com/muweigg/JSBox-Scripts/master/MUIDownloader/README.md';
 let version = '1.0.0', data = null;
 
 if (!link) return;
@@ -74,7 +76,7 @@ function reCAPTCHA() {
 
 function checkUpdate () {
     $http.get({
-        url: "https://raw.githubusercontent.com/muweigg/JSBox-Scripts/master/MUIDownloader/README.md",
+        url: versionCheckUrl,
         handler: function(resp) {
             if (version == resp.data) return;
             $console.info('更新脚本');
