@@ -1,6 +1,7 @@
 const link = $clipboard.link,
-    host = 'http://www.clipconverter.cc',
-    versionCheckUrl = 'https://raw.githubusercontent.com/muweigg/JSBox-Scripts/master/MUIDownloader/README.md';
+    parseHost = 'http://www.clipconverter.cc',
+    versionCheckUrl = 'https://raw.githubusercontent.com/muweigg/JSBox-Scripts/master/MUIDownloader/README.md',
+    updateURL = 'jsbox://install?url=https://raw.githubusercontent.com/muweigg/JSBox-Scripts/master/MUIDownloader/MUIDownloader.js&icon=icon_035.png&name=MUIDownload';
 let version = '1.0.0', data = null;
 
 if (!link) return;
@@ -67,7 +68,7 @@ function reCAPTCHA() {
         views:[{
             type: 'web',
             props: {
-                url: `${host}${data.redirect}`
+                url: `${parseHost}${data.redirect}`
             },
             layout: $layout.fill
         }]
@@ -89,6 +90,7 @@ function checkUpdate () {
                     title: '更新',
                     handler () {
                         $ui.toast('正在更新');
+                        $app.openURL(encodeURI(`${updateURL} ${resp.data}`));
                     }
                 }]
             })
@@ -126,9 +128,9 @@ $ui.render({
 })
 
 function analysisVideoByLink() {
-    $ui.loading(true);
+    // $ui.loading(true);
     $http.post({
-        url: `${host}/check.php`,
+        url: `${parseHost}/check.php`,
         form: { mediaurl: link },
         handler: function(resp) {
             data = resp.data;
@@ -137,7 +139,7 @@ function analysisVideoByLink() {
             } else {
                 $('view').add(getVideoView(data));
             }
-            $ui.loading(false);
+            // $ui.loading(false);
             $device.taptic(0);
         }
     })
