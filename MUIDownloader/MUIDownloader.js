@@ -1,5 +1,5 @@
 const link = $clipboard.link,
-    parseHost = 'http://www.clipconverter.cc',
+    parseHost = 'http://youtube1080.megavn.net',
     versionCheckUrl = 'https://raw.githubusercontent.com/muweigg/JSBox-Scripts/master/MUIDownloader/README.md',
     updateURL = 'jsbox://install?url=https://raw.githubusercontent.com/muweigg/JSBox-Scripts/master/MUIDownloader/MUIDownloader.js&icon=icon_035.png&name=MUIDownload',
     colors = {
@@ -7,9 +7,12 @@ const link = $clipboard.link,
         labelBgc: $color('#757575'),
         labelColor: $color('#fff')
     };
-let version = '1.0.0', data = null;
+let version = '1.0.0', urlexec = '', keyword = '', data = null;
 
 if (!link) return;
+
+keyword = link.match(/.*\/.*v=(.*?)$|.*\/(.*?)$/);
+keyword = keyword[1] || keyword[2];
 
 function getVideoView (data) {
     return {
@@ -27,7 +30,7 @@ function getVideoView (data) {
                     radius: 5
                 },
                 layout: function (make) {
-                    make.top.left.right.equalTo(0).inset(10);
+                    make.top.left.right.bottom.equalTo(0).inset(10);
                     make.height.equalTo(308);
                 },
                 views: [
@@ -35,8 +38,8 @@ function getVideoView (data) {
                         type: "video",
                         props: {
                             id: 'previewVideo',
-                            src: data.url[3].url,
-                            poster: data.thumb,
+                            src: data.download[0].url,
+                            poster: data.thumb[data.thumb.length - 1],
                             bgcolor: $color('#fff'),
                         },
                         layout: function(make, view) {
@@ -50,7 +53,7 @@ function getVideoView (data) {
                         type: 'label',
                         props: {
                             id: 'videoFilename',
-                            text: data.filename,
+                            text: data.info.title,
                         },
                         layout (make) {
                             make.top.equalTo($('previewVideo').bottom);
@@ -59,21 +62,27 @@ function getVideoView (data) {
                         },
                     },
                     {
-                        type: 'button',
+                        type: 'list',
                         props: {
-                            title: '下载',
+                            data: [
+                                {
+                                    title: "Video + Audio:",
+                                    rows: ["0-0", "0-1", "0-2"]
+                                },
+                                {
+                                    title: "High Quality: (Merge Audio online)",
+                                    rows: ["1-0", "1-1", "1-2"]
+                                }
+                            ]
                         },
                         layout (make) {
-                            make.top.equalTo($('videoFilename').bottom);
-                            make.right.left.equalTo(0).inset(10);
-                            make.height.equalTo(50);
+                            make.top.equalTo($('videoFilename').bottom).inset(0);
+                            make.right.bottom.left.equalTo(0);
                         },
                         events: {
-                            tapped: function(sender) {
-                                $ui.alert({
-                                    title: "提示",
-                                    message: "下载",
-                                })
+                            didSelect: function (sender, indexPath, data) {
+                                $console.info(data);
+                                $console.info(indexPath);
                             }
                         }
                     }
@@ -100,7 +109,7 @@ function reCAPTCHA() {
 function checkUpdate () {
     $http.get({
         url: versionCheckUrl,
-        handler: function(resp) {
+        handler (resp) {
             $console.info(`Version: ${resp.data}`);
             if (version == resp.data) return;
             $console.info('更新脚本');
@@ -113,7 +122,7 @@ function checkUpdate () {
                     title: '更新',
                     handler () {
                         $ui.toast('正在更新');
-                        $app.openURL(encodeURI(`${updateURL} ${resp.data}`));
+                        $app.openURL(encodeURI(`${updateURL}`));
                     }
                 }]
             })
@@ -123,6 +132,7 @@ function checkUpdate () {
 
 $ui.render({
     props: {
+        id: 'mainView',
         title: 'MUI Downloader',
         bgcolor: colors.bgc
     },
@@ -166,19 +176,16 @@ $ui.render({
     ]
 })
 
-function analysisVideoByLink() {
+function analysisVideoByLink () {
     // $ui.loading(true);
     $http.post({
-        url: `${parseHost}/check.php`,
-        form: { mediaurl: link },
+        url: `${parseHost}/ajax.php`,
+        form: { curID: keyword, url: link },
+        timeout: 1000,
         handler: function(resp) {
             $console.info(JSON.stringify(resp, null, 2));
             data = resp.data;
-            if (data && data['redirect']) {
-                $ui.push(reCAPTCHA());
-            } else {
-                $('view').add(getVideoView(data));
-            }
+            $('view').add(getVideoView(data));
             // $ui.loading(false);
             $device.taptic(0);
         }
