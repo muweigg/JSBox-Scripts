@@ -1,6 +1,6 @@
 const link = $clipboard.link,
     parseHost = 'http://youtube1080.megavn.net',
-    versionCheckUrl = 'https://raw.githubusercontent.com/muweigg/JSBox-Scripts/master/MUIDownloader/README.md',
+    checkVersionUrl = 'https://raw.githubusercontent.com/muweigg/JSBox-Scripts/master/MUIDownloader/README.md',
     updateURL = 'jsbox://install?url=https://raw.githubusercontent.com/muweigg/JSBox-Scripts/master/MUIDownloader/MUIDownloader.js&icon=icon_035.png&name=MUIDownload',
     colors = {
         bgc: $color('#eee'),
@@ -15,7 +15,6 @@ keyword = link.match(/.*\/.*v=(.*?)$|.*\/(.*?)$/);
 keyword = keyword[1] || keyword[2];
 
 function getVideoView (data) {
-    let video = data.download.filter(v => v.type === 'mp4')[0];
     return {
         type: 'view',
         props: {
@@ -39,7 +38,7 @@ function getVideoView (data) {
                         type: "video",
                         props: {
                             id: 'previewVideo',
-                            src: video.url,
+                            src: data.previewVideo.url,
                             poster: data.thumb[data.thumb.length - 1],
                             bgcolor: $color('#fff'),
                         },
@@ -65,14 +64,23 @@ function getVideoView (data) {
                     {
                         type: 'list',
                         props: {
+                            template: [
+                                {
+                                    type: 'label',
+                                    porps: {},
+                                    layout (make, view) {
+                                        make.center.equalTo(view.super);
+                                    }
+                                }
+                            ],
                             data: [
                                 {
                                     title: "Video + Audio:",
-                                    rows: ["0-0", "0-1", "0-2"]
+                                    rows: data.download
                                 },
                                 {
                                     title: "High Quality: (Merge Audio online)",
-                                    rows: ["1-0", "1-1", "1-2"]
+                                    rows: data.downloadf
                                 }
                             ]
                         },
@@ -83,7 +91,6 @@ function getVideoView (data) {
                         events: {
                             didSelect: function (sender, indexPath, data) {
                                 $console.info(data);
-                                $console.info(indexPath);
                             }
                         }
                     }
@@ -109,7 +116,7 @@ function reCAPTCHA() {
 
 function checkUpdate () {
     $http.get({
-        url: versionCheckUrl,
+        url: checkVersionUrl,
         handler (resp) {
             $console.info(`Version: ${resp.data}`);
             if (version == resp.data) return;
@@ -177,16 +184,22 @@ $ui.render({
 })
 
 function analysisVideoByLink () {
-    // $ui.loading(true);
+    $ui.loading(true);
     $http.post({
         url: `${parseHost}/ajax.php`,
         form: { curID: keyword, url: link },
-        timeout: 1000,
+        timeout: 30,
         handler: function(resp) {
             $console.info(JSON.stringify(resp, null, 2));
             data = resp.data;
+            urlexec = data.urlexec;
+            data.previewVideo = data.download.filter(v => {
+                v.label = {text: `${v.quality} ${v.type}`};
+                return v.type === 'mp4';
+            })[0];
+            data.downloadf.map(v => v.label = {text: `${v.quality} ${v.type}`});
             $('view').add(getVideoView(data));
-            // $ui.loading(false);
+            $ui.loading(false);
             $device.taptic(0);
         }
     })
