@@ -15,6 +15,7 @@ keyword = link.match(/.*\/.*v=(.*?)$|.*\/(.*?)$/);
 keyword = keyword[1] || keyword[2];
 
 function getVideoView (data) {
+    let video = data.download.filter(v => v.type === 'mp4')[0];
     return {
         type: 'view',
         props: {
@@ -38,7 +39,7 @@ function getVideoView (data) {
                         type: "video",
                         props: {
                             id: 'previewVideo',
-                            src: data.download[0].url,
+                            src: video.url,
                             poster: data.thumb[data.thumb.length - 1],
                             bgcolor: $color('#fff'),
                         },
@@ -132,7 +133,6 @@ function checkUpdate () {
 
 $ui.render({
     props: {
-        id: 'mainView',
         title: 'MUI Downloader',
         bgcolor: colors.bgc
     },
@@ -166,7 +166,7 @@ $ui.render({
         {
             type: 'view',
             props: {
-                bgcolor: $color('#EEEEEE')
+                bgcolor: colors.bgc
             },
             layout (make) {
                 make.top.equalTo($('labelView').bottom);
