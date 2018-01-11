@@ -5,7 +5,13 @@ const link = $clipboard.link,
     colors = {
         bgc: $color('#eee'),
         labelBgc: $color('#757575'),
-        labelColor: $color('#fff')
+        labelColor: $color('#fff'),
+        labelTypeColor: {
+            'mp4': $color('#4CAF50'),
+            '3gp': $color('#00B0FF'),
+            'webm': $color('#757575'),
+            'mp3': $color('#FF8F00')
+        },
     };
 let version = '1.0.0', urlexec = '', keyword = '', data = null;
 
@@ -64,15 +70,34 @@ function getVideoView (data) {
                     {
                         type: 'list',
                         props: {
-                            template: [
-                                {
-                                    type: 'label',
-                                    porps: {},
-                                    layout (make, view) {
-                                        make.center.equalTo(view.super);
+                            template: {
+                                views: [
+                                    {
+                                        type: "label",
+                                        props: {
+                                            id: "itemLabel",
+                                        },
+                                        layout (make, view) {
+                                            make.center.equalTo(view.super);
+                                        }
+                                    },
+                                    {
+                                        type: "label",
+                                        props: {
+                                            id: "itemType",
+                                            textColor: $color("#fff"),
+                                            align: $align.center,
+                                            font: $font(12),
+                                            radius: 10
+                                        },
+                                        layout (make, view) {
+                                            make.size.equalTo($size(50, 20));
+                                            make.right.equalTo(10).inset(10);
+                                            make.centerY.equalTo(view.super);
+                                        }
                                     }
-                                }
-                            ],
+                                ]
+                            },
                             data: [
                                 {
                                     title: "Video + Audio:",
@@ -91,6 +116,19 @@ function getVideoView (data) {
                         events: {
                             didSelect: function (sender, indexPath, data) {
                                 $console.info(data);
+                                if (data && data.url) {
+                                    $http.download({
+                                        url: data.url,
+                                        progress: function(bytesWritten, totalBytes) {
+                                            var percentage = bytesWritten * 1.0 / totalBytes
+                                        },
+                                        handler: function(resp) {
+                                            $share.sheet([`${keyword} ${data.quality}.${data.type}`, resp.data])
+                                        }
+                                    })
+                                } else if (data) {
+                                    $ui.toast('请求转换服务器');
+                                }
                             }
                         }
                     }
@@ -112,30 +150,6 @@ function reCAPTCHA() {
             layout: $layout.fill
         }]
     };
-}
-
-function checkUpdate () {
-    $http.get({
-        url: checkVersionUrl,
-        handler (resp) {
-            $console.info(`Version: ${resp.data}`);
-            if (version == resp.data) return;
-            $console.info('更新脚本');
-            $ui.alert({
-                title: "更新提示",
-                message: `发现新版本: ${resp.data}\n当前版本: ${version}\n是否更新 ?`,
-                actions: [{
-                    title: '取消',
-                }, {
-                    title: '更新',
-                    handler () {
-                        $ui.toast('正在更新');
-                        $app.openURL(encodeURI(`${updateURL}`));
-                    }
-                }]
-            })
-        }
-    });
 }
 
 $ui.render({
@@ -194,15 +208,49 @@ function analysisVideoByLink () {
             data = resp.data;
             urlexec = data.urlexec;
             data.previewVideo = data.download.filter(v => {
-                v.label = {text: `${v.quality} ${v.type}`};
+                v.itemLabel = { text: v.quality };
+                v.itemType = {
+                    text: v.type.toLocaleUpperCase(),
+                    bgcolor: colors.labelTypeColor[v.type]
+                };
                 return v.type === 'mp4';
             })[0];
-            data.downloadf.map(v => v.label = {text: `${v.quality} ${v.type}`});
+            data.downloadf.map(v => {
+                v.itemLabel = { text: v.quality };
+                v.itemType = {
+                    text: v.type.toLocaleUpperCase(),
+                    bgcolor: colors.labelTypeColor[v.type]
+                };
+            });
             $('view').add(getVideoView(data));
             $ui.loading(false);
             $device.taptic(0);
         }
     })
+}
+
+function checkUpdate () {
+    $http.get({
+        url: checkVersionUrl,
+        handler (resp) {
+            $console.info(`Version: ${resp.data}`);
+            if (version == resp.data) return;
+            $console.info('更新脚本');
+            $ui.alert({
+                title: "更新提示",
+                message: `发现新版本: ${resp.data}\n当前版本: ${version}\n是否更新 ?`,
+                actions: [{
+                    title: '取消',
+                }, {
+                    title: '更新',
+                    handler () {
+                        $ui.toast('正在更新');
+                        $app.openURL(encodeURI(`${updateURL}`));
+                    }
+                }]
+            })
+        }
+    });
 }
 
 checkUpdate();
