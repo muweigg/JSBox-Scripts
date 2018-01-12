@@ -13,7 +13,8 @@ const link = $clipboard.link,
             'mp3': $color('#FF8F00')
         },
     };
-let version = '1.0.0', urlexec = '', keyword = '', data = null;
+
+let version = '1.0.0', urlexec = '', keyword = '', originalData = null;
 
 if (!link) return;
 
@@ -117,17 +118,46 @@ function getVideoView (data) {
                             didSelect: function (sender, indexPath, data) {
                                 $console.info(data);
                                 if (data && data.url) {
+                                    $ui.toast("开始下载");
                                     $http.download({
                                         url: data.url,
-                                        progress: function(bytesWritten, totalBytes) {
-                                            var percentage = bytesWritten * 1.0 / totalBytes
-                                        },
                                         handler: function(resp) {
-                                            $share.sheet([`${keyword} ${data.quality}.${data.type}`, resp.data])
+                                            $device.taptic(0);
+                                            $share.sheet([`${keyword} ${data.quality}.${data.type}`, resp.data]);
+                                        }
+                                    });
+                                } else if (data) {
+                                    $ui.loading(true);
+                                    $ui.toast('请求转换服务器，等待转制');
+                                    const params = {
+                                        urlexec: urlexec,
+                                        video_id: keyword,
+                                        video_url: link,
+                                        itag: data.itag,
+                                        action: data.quality,
+                                        title: originalData.info.title,
+                                        token: originalData.token,
+                                        email: 'muweigg@gmail.com'
+                                    };
+                                    $http.post({
+                                        url: originalData.urlexec,
+                                        timeout: 60,
+                                        form: params,
+                                        handler: function(resp) {
+                                            let data = resp.data;
+                                            $delay(1, () => {
+                                                $ui.toast("开始下载");
+                                                $http.download({
+                                                    url: encodeURI(data.url),
+                                                    handler: function(resp) {
+                                                        $device.taptic(0);
+                                                        $ui.loading(false);
+                                                        $share.sheet([`${data.filename}`, resp.data]);
+                                                    }
+                                                });
+                                            });
                                         }
                                     })
-                                } else if (data) {
-                                    $ui.toast('请求转换服务器');
                                 }
                             }
                         }
@@ -138,23 +168,9 @@ function getVideoView (data) {
     }
 }
 
-function reCAPTCHA() {
-    $ui.alert('需要完成人机验证\n验证完成后\n点击 continue 重试即可');
-    return {
-        type: 'view',
-        views:[{
-            type: 'web',
-            props: {
-                url: `${parseHost}${data.redirect}`
-            },
-            layout: $layout.fill
-        }]
-    };
-}
-
 $ui.render({
     props: {
-        title: 'MUI Downloader',
+        title: `MUI Downloader ${version}`,
         bgcolor: colors.bgc
     },
     views: [
@@ -204,9 +220,9 @@ function analysisVideoByLink () {
         form: { curID: keyword, url: link },
         timeout: 30,
         handler: function(resp) {
-            $console.info(JSON.stringify(resp, null, 2));
-            data = resp.data;
-            urlexec = data.urlexec;
+            originalData = resp.data;
+            urlexec = originalData.urlexec;
+            let data = Object.assign({}, originalData);
             data.previewVideo = data.download.filter(v => {
                 v.itemLabel = { text: v.quality };
                 v.itemType = {
@@ -233,9 +249,8 @@ function checkUpdate () {
     $http.get({
         url: checkVersionUrl,
         handler (resp) {
-            $console.info(`Version: ${resp.data}`);
             if (version == resp.data) return;
-            $console.info('更新脚本');
+            $device.taptic(0);
             $ui.alert({
                 title: "更新提示",
                 message: `发现新版本: ${resp.data}\n当前版本: ${version}\n是否更新 ?`,
