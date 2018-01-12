@@ -127,7 +127,7 @@ function getVideoView (data) {
                                     });
                                 } else if (data) {
                                     $ui.loading(true);
-                                    $ui.toast('请求转换服务器，等待转制');
+                                    $ui.toast('请求转换服务器，等待转制', 5);
                                     const params = {
                                         urlexec: urlexec,
                                         video_id: keyword,
@@ -145,7 +145,7 @@ function getVideoView (data) {
                                         handler: function(resp) {
                                             let data = resp.data;
                                             $delay(1, () => {
-                                                $ui.toast(`开始下载 ${data.ext.toLocaleUpperCase()}`);
+                                                $ui.toast(`开始下载 ${data.ext.toLocaleUpperCase()}`, 5);
                                                 $http.download({
                                                     url: encodeURI(data.url),
                                                     handler: function(resp) {
@@ -214,6 +214,7 @@ $ui.render({
 
 function analysisVideoByLink () {
     $ui.loading(true);
+    $ui.toast(`自动解析地址`);
     $http.post({
         url: `${parseHost}/ajax.php`,
         form: { curID: keyword, url: link },
