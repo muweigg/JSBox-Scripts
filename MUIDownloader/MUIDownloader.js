@@ -116,9 +116,8 @@ function getVideoView (data) {
                         },
                         events: {
                             didSelect: function (sender, indexPath, data) {
-                                $console.info(data);
                                 if (data && data.url) {
-                                    $ui.toast("开始下载");
+                                    $ui.toast(`开始下载 ${data.type.toLocaleUpperCase()}`);
                                     $http.download({
                                         url: data.url,
                                         handler: function(resp) {
@@ -146,7 +145,7 @@ function getVideoView (data) {
                                         handler: function(resp) {
                                             let data = resp.data;
                                             $delay(1, () => {
-                                                $ui.toast("开始下载");
+                                                $ui.toast(`开始下载 ${data.ext.toLocaleUpperCase()}`);
                                                 $http.download({
                                                     url: encodeURI(data.url),
                                                     handler: function(resp) {
