@@ -36,7 +36,7 @@ function getVideoView (data) {
                     bgcolor: $color('#fff'),
                     radius: 5
                 },
-                layout: function (make) {
+                layout (make) {
                     make.top.left.right.bottom.equalTo(0).inset(10);
                     make.height.equalTo(308);
                 },
@@ -49,7 +49,7 @@ function getVideoView (data) {
                             poster: data.thumb[data.thumb.length - 1],
                             bgcolor: $color('#fff'),
                         },
-                        layout: function(make, view) {
+                        layout (make, view) {
                             const h = Math.floor(($device.info.screen.width - 40) * 9 / 16);
                             make.top.equalTo(0).inset(7);
                             make.left.right.inset(7);
@@ -115,7 +115,7 @@ function getVideoView (data) {
                             make.right.bottom.left.equalTo(0);
                         },
                         events: {
-                            didSelect: function (sender, indexPath, data) {
+                            didSelect (sender, indexPath, data) {
                                 if (data && data.url) {
                                     $ui.toast(`开始下载 ${data.type.toLocaleUpperCase()}`);
                                     $http.download({
@@ -219,7 +219,7 @@ function analysisVideoByLink () {
         url: `${parseHost}/ajax.php`,
         form: { curID: keyword, url: link },
         timeout: 30,
-        handler: function(resp) {
+        handler (resp) {
             originalData = resp.data;
             urlexec = originalData.urlexec;
             let data = Object.assign({}, originalData);
