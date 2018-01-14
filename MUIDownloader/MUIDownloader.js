@@ -158,50 +158,52 @@ function getVideoView (data) {
     }
 }
 
-$ui.render({
-    props: {
-        title: `MUI Downloader ${version}`,
-        bgcolor: colors.bgc
-    },
-    views: [
-        {
-            type: 'view',
-            props: {
-                id: 'labelView',
-                bgcolor: colors.labelBgc,
-                radius: 5
-            },
-            layout (make) {
-                make.top.equalTo(10);
-                make.right.left.inset(10);
-                make.height.equalTo(50);
-            },
-            views: [
-                {
-                    type: 'label',
-                    props: {
-                        text: link,
-                        textColor: colors.labelColor,
-                    },
-                    layout (make, view) {
-                        make.right.left.inset(10);
-                        make.centerY.equalTo(view.super);
-                    }
-                }
-            ]
+function initUI () {
+    $ui.render({
+        props: {
+            title: `MUI Downloader ${version}`,
+            bgcolor: colors.bgc
         },
-        {
-            type: 'view',
-            props: {
-                bgcolor: colors.bgc
+        views: [
+            {
+                type: 'view',
+                props: {
+                    id: 'labelView',
+                    bgcolor: colors.labelBgc,
+                    radius: 5
+                },
+                layout (make) {
+                    make.top.equalTo(10);
+                    make.right.left.inset(10);
+                    make.height.equalTo(50);
+                },
+                views: [
+                    {
+                        type: 'label',
+                        props: {
+                            text: link,
+                            textColor: colors.labelColor,
+                        },
+                        layout (make, view) {
+                            make.right.left.inset(10);
+                            make.centerY.equalTo(view.super);
+                        }
+                    }
+                ]
             },
-            layout (make) {
-                make.top.equalTo($('labelView').bottom);
-                make.left.right.bottom.equalTo(0);
+            {
+                type: 'view',
+                props: {
+                    bgcolor: colors.bgc
+                },
+                layout (make) {
+                    make.top.equalTo($('labelView').bottom);
+                    make.left.right.bottom.equalTo(0);
+                }
             }
-        }
-    ]
-});
+        ]
+    });
+}
 
 function ytDownload (data) {
     if (data && data.url) {
@@ -380,5 +382,6 @@ function checkUpdate () {
 }
 
 checkUpdate();
+initUI();
 if (/youtu(\.?be)?/.test(link)) analysisYouTubeVideoByLink();
 if (/tumblr/.test(link)) analysisTumblrVideoByLink();
