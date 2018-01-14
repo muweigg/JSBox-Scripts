@@ -1,7 +1,7 @@
 const link = $clipboard.link,
     parseHost = 'http://youtube1080.megavn.net',
     checkVersionUrl = 'https://raw.githubusercontent.com/muweigg/JSBox-Scripts/master/MUIDownloader/README.md',
-    updateURL = 'jsbox://install?url=https://raw.githubusercontent.com/muweigg/JSBox-Scripts/master/MUIDownloader/MUIDownloader.js&icon=icon_035.png&name=MUIDownload',
+    updateURL = 'jsbox://install?url=https://raw.githubusercontent.com/muweigg/JSBox-Scripts/master/MUIDownloader/MUIDownloader.js&icon=icon_035.png&name=MUIDownloader',
     colors = {
         bgc: $color('#eee'),
         labelBgc: $color('#757575'),
