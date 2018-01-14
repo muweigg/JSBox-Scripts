@@ -4,8 +4,7 @@
  * @description YouTube & Tumblr 视频下载器
  */
 
-const link = $clipboard.link,
-    parseHost = 'http://youtube1080.megavn.net',
+const parseHost = 'http://youtube1080.megavn.net',
     checkVersionUrl = 'https://raw.githubusercontent.com/muweigg/JSBox-Scripts/master/MUIDownloader/README.md',
     updateURL = 'jsbox://install?url=https://raw.githubusercontent.com/muweigg/JSBox-Scripts/master/MUIDownloader/MUIDownloader.js&icon=icon_035.png&name=MUIDownloader',
     colors = {
@@ -20,7 +19,13 @@ const link = $clipboard.link,
         },
     };
 
-let version = '1.1.1', urlexec = '', keyword = '', originalData = null;
+let version = '1.1.2', link = '', keyword = '', originalData = null;
+
+link = $detector.link($context.text).map(link => {
+    if (/youtu(\.?be)?|tumblr/.test(link))
+        return link;
+});
+link = link.length > 0 ? link[0] : $context.link ? $context.link : $clipboard.link;
 
 if (!link) return;
 if (!/youtu(\.?be)?|tumblr/.test(link)) {
@@ -29,6 +34,12 @@ if (!/youtu(\.?be)?|tumblr/.test(link)) {
         message: "目前只支持：YouTube & Tumblr",
     });
     return;
+}
+
+if (/youtu(\.?be)?/.test(link)) {
+    keyword = link.match(/.*\/.*v=(.*?)(&feature=.*?)?$|.*\/(.*?)(&feature=.*?)?$/);
+    keyword = keyword[1] || keyword[3];
+    link = `https://youtu.be/${keyword}`;
 }
 
 function convertFunc (func) {
@@ -206,7 +217,7 @@ function ytDownload (data) {
         $ui.loading(true);
         $ui.toast('请求转换服务器，等待转制', 5);
         const params = {
-            urlexec: urlexec,
+            urlexec: originalData.urlexec,
             video_id: keyword,
             video_url: link,
             itag: data.itag,
@@ -249,10 +260,6 @@ function tDownload (data) {
 }
 
 function analysisYouTubeVideoByLink () {
-    
-    keyword = link.match(/.*\/.*v=(.*?)$|.*\/(.*?)$/);
-    keyword = keyword[1] || keyword[2];
-
     $ui.loading(true);
     $ui.toast(`解析地址`);
     $http.post({
@@ -261,7 +268,6 @@ function analysisYouTubeVideoByLink () {
         timeout: 30,
         handler (resp) {
             originalData = resp.data;
-            urlexec = originalData.urlexec;
             let data = Object.assign({}, originalData);
             data.url = data.download.filter(v => {
                 v.title = data.info.title;
