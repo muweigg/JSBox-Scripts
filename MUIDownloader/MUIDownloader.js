@@ -1,3 +1,9 @@
+/**
+ * MUI Downloader
+ * @author MUI <muweigg@gmail.com>
+ * @description YouTube & Tumblr 视频下载器
+ */
+
 const link = $clipboard.link,
     parseHost = 'http://youtube1080.megavn.net',
     checkVersionUrl = 'https://raw.githubusercontent.com/muweigg/JSBox-Scripts/master/MUIDownloader/README.md',
