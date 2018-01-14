@@ -14,14 +14,37 @@ const link = $clipboard.link,
         },
     };
 
-let version = '1.0.0', urlexec = '', keyword = '', originalData = null;
+let version = '1.1.1', urlexec = '', keyword = '', originalData = null;
 
 if (!link) return;
+if (!/youtu(\.?be)?|tumblr/.test(link)) {
+    $ui.alert({
+        title: "暂不支持",
+        message: "目前只支持：YouTube & Tumblr",
+    });
+    return;
+}
 
-keyword = link.match(/.*\/.*v=(.*?)$|.*\/(.*?)$/);
-keyword = keyword[1] || keyword[2];
+function convertFunc (func) {
+    return func.toString().replace(/^.*?\{|\}.*?$/g, '');
+}
 
 function getVideoView (data) {
+
+    let listData = [
+        {
+            title: "Video + Audio:",
+            rows: data.download
+        }
+    ];
+
+    if (data.downloadf) {
+        listData.push({
+            title: "High Quality: (Merge Audio online)",
+            rows: data.downloadf
+        });
+    }
+
     return {
         type: 'view',
         props: {
@@ -45,8 +68,8 @@ function getVideoView (data) {
                         type: "video",
                         props: {
                             id: 'previewVideo',
-                            src: data.previewVideo.url,
-                            poster: data.thumb[data.thumb.length - 1],
+                            src: data.url,
+                            poster: data.thumb,
                             bgcolor: $color('#fff'),
                         },
                         layout (make, view) {
@@ -99,16 +122,7 @@ function getVideoView (data) {
                                     }
                                 ]
                             },
-                            data: [
-                                {
-                                    title: "Video + Audio:",
-                                    rows: data.download
-                                },
-                                {
-                                    title: "High Quality: (Merge Audio online)",
-                                    rows: data.downloadf
-                                }
-                            ]
+                            data: listData
                         },
                         layout (make) {
                             make.top.equalTo($('videoFilename').bottom).inset(0);
@@ -116,48 +130,8 @@ function getVideoView (data) {
                         },
                         events: {
                             didSelect (sender, indexPath, data) {
-                                if (data && data.url) {
-                                    $ui.toast(`开始下载 ${data.type.toLocaleUpperCase()}`);
-                                    $http.download({
-                                        url: data.url,
-                                        handler: function(resp) {
-                                            $device.taptic(0);
-                                            $share.sheet([`${keyword} ${data.quality}.${data.type}`, resp.data]);
-                                        }
-                                    });
-                                } else if (data) {
-                                    $ui.loading(true);
-                                    $ui.toast('请求转换服务器，等待转制', 5);
-                                    const params = {
-                                        urlexec: urlexec,
-                                        video_id: keyword,
-                                        video_url: link,
-                                        itag: data.itag,
-                                        action: data.quality,
-                                        title: originalData.info.title,
-                                        token: originalData.token,
-                                        email: 'muweigg@gmail.com'
-                                    };
-                                    $http.post({
-                                        url: originalData.urlexec,
-                                        timeout: 60,
-                                        form: params,
-                                        handler: function(resp) {
-                                            let data = resp.data;
-                                            $delay(1, () => {
-                                                $ui.toast(`开始下载 ${data.ext.toLocaleUpperCase()}`, 5);
-                                                $http.download({
-                                                    url: encodeURI(data.url),
-                                                    handler: function(resp) {
-                                                        $device.taptic(0);
-                                                        $ui.loading(false);
-                                                        $share.sheet([`${data.filename}`, resp.data]);
-                                                    }
-                                                });
-                                            });
-                                        }
-                                    })
-                                }
+                                if (/youtu(\.?be)?/.test(link)) ytDownload(data);
+                                if (/tumblr/.test(link)) tDownload(data);
                             }
                         }
                     }
@@ -210,11 +184,71 @@ $ui.render({
             }
         }
     ]
-})
+});
 
-function analysisVideoByLink () {
+function ytDownload (data) {
+    if (data && data.url) {
+        $ui.toast(`开始下载 ${data.type.toLocaleUpperCase()}`);
+        $http.download({
+            url: data.url,
+            handler: function(resp) {
+                $device.taptic(0);
+                $share.sheet([`${data.title}-${keyword}-${data.quality}.${data.type}`, resp.data]);
+            }
+        });
+    } else if (data) {
+        $ui.loading(true);
+        $ui.toast('请求转换服务器，等待转制', 5);
+        const params = {
+            urlexec: urlexec,
+            video_id: keyword,
+            video_url: link,
+            itag: data.itag,
+            action: data.quality,
+            title: originalData.info.title,
+            token: originalData.token,
+            email: 'muweigg@gmail.com'
+        };
+        $http.post({
+            url: originalData.urlexec,
+            timeout: 60,
+            form: params,
+            handler: function(resp) {
+                let data = resp.data;
+                $delay(1, () => {
+                    $ui.toast(`开始下载 ${data.ext.toLocaleUpperCase()}`, 5);
+                    $http.download({
+                        url: encodeURI(data.url),
+                        handler: function(resp) {
+                            $device.taptic(0);
+                            $ui.loading(false);
+                            $share.sheet([`${data.title}.${data.ext}`, resp.data]);
+                        }
+                    });
+                });
+            }
+        })
+    }
+}
+
+function tDownload (data) {
+    $ui.toast(`开始下载`);
+    $http.download({
+        url: data.url,
+        handler: function(resp) {
+            $device.taptic(0);
+            $share.sheet([`${data.title}.mp4`, resp.data]);
+        }
+    });
+}
+
+function analysisYouTubeVideoByLink () {
+    
+    keyword = link.match(/.*\/.*v=(.*?)$|.*\/(.*?)$/);
+    keyword = keyword[1] || keyword[2];
+
     $ui.loading(true);
-    $ui.toast(`自动解析地址`);
+    $ui.toast(`解析地址`);
     $http.post({
         url: `${parseHost}/ajax.php`,
         form: { curID: keyword, url: link },
@@ -223,26 +257,91 @@ function analysisVideoByLink () {
             originalData = resp.data;
             urlexec = originalData.urlexec;
             let data = Object.assign({}, originalData);
-            data.previewVideo = data.download.filter(v => {
+            data.url = data.download.filter(v => {
+                v.title = data.info.title;
                 v.itemLabel = { text: v.quality };
                 v.itemType = {
                     text: v.type.toLocaleUpperCase(),
                     bgcolor: colors.labelTypeColor[v.type]
                 };
                 return v.type === 'mp4';
-            })[0];
-            data.downloadf.map(v => {
-                v.itemLabel = { text: v.quality };
-                v.itemType = {
-                    text: v.type.toLocaleUpperCase(),
-                    bgcolor: colors.labelTypeColor[v.type]
-                };
-            });
+            })[0].url;
+            data.thumb = data.thumb[data.thumb.length - 1];
+            if (data.downloadf instanceof Array) {
+                data.downloadf.map(v => {
+                    v.title = data.info.title;
+                    v.itemLabel = { text: v.quality };
+                    v.itemType = {
+                        text: v.type.toLocaleUpperCase(),
+                        bgcolor: colors.labelTypeColor[v.type]
+                    };
+                });
+            } else {
+                delete data.downloadf;
+            }
             $('view').add(getVideoView(data));
             $ui.loading(false);
             $device.taptic(0);
         }
     })
+}
+
+function parseHTML () {
+    let data = {
+        url: '',
+        download: [],
+        thumb: '',
+        info: {
+            title: ''
+        }
+    }
+    const img = document.querySelector('#videoContainer img');
+    const atags = document.querySelectorAll('#videoDownload a');
+    for (let i = 0; i < atags.length; i++ ) {
+        let a = atags[i];
+        if (/tumblr.*?video_file/.test(a.href)) {
+            data.download.push({
+                url: a.href
+            });
+        }
+    }
+    if (img.src != '') data.thumb = img.src;
+    let v = data.download[data.download.length - 1];
+    data.url = v.url;
+    data.info.title = v.url.match(/.*\/(.*?)$/)[1];
+    $notify('processData', data);
+}
+
+function analysisTumblrVideoByLink () {
+    $ui.loading(true);
+    $ui.toast(`解析地址中，请耐心等待`);
+    $('view').add({
+        type: "web",
+        props: {
+            url: `https://www.tubeoffline.com/downloadFrom.php?host=tumblr&video=${encodeURI(link)}`,
+        },
+        layout (make) {
+            make.size.equalTo($size(0, 0));
+        },
+        events: {
+            didFinish (sender) {
+                $ui.loading(false);
+                $ui.toast('解析完成');
+                sender.eval({ script: convertFunc(parseHTML) });
+            },
+            processData (data) {
+                data.download.map(v => {
+                    v.itemLabel = { text: data.info.title };
+                    v.itemType = {
+                        text: 'MP4',
+                        bgcolor: colors.labelTypeColor['mp4']
+                    };
+                });
+                $('view').add(getVideoView(data));
+                $device.taptic(0);
+            }
+        }
+    });
 }
 
 function checkUpdate () {
@@ -269,4 +368,5 @@ function checkUpdate () {
 }
 
 checkUpdate();
-analysisVideoByLink();
+if (/youtu(\.?be)?/.test(link)) analysisYouTubeVideoByLink();
+if (/tumblr/.test(link)) analysisTumblrVideoByLink();
