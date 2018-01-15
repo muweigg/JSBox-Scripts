@@ -19,7 +19,7 @@ const parseHost = 'http://youtube1080.megavn.net',
         },
     };
 
-let version = '1.1.2', link = '', keyword = '', originalData = null;
+let version = '1.1.3', link = '', keyword = '', originalData = null;
 
 link = $detector.link($context.text).map(link => {
     if (/youtu(\.?be)?|tumblr/.test(link))
@@ -271,6 +271,14 @@ function analysisYouTubeVideoByLink () {
         handler (resp) {
             originalData = resp.data;
             let data = Object.assign({}, originalData);
+            if (!data.download && !data.downloadf) {
+                $ui.alert({
+                    title: "解析错误",
+                    message: "直播不能下载及转换",
+                });
+                $ui.loading(false);
+                return;
+            }
             data.url = data.download.filter(v => {
                 v.title = data.info.title;
                 v.itemLabel = { text: v.quality };
