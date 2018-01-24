@@ -1,6 +1,10 @@
 const host = 'https://avgle.com';
-    url = encodeURI("https://avgle.com/video/99689/cmi-120-ゲスの極み映像-人妻25人目");
-// const url = encodeURI('https://avgle.com/video/130158/heyzo-1651');
+
+let link = $detector.link($context.text);
+
+link = link.length > 0 ? link[0] : $context.link ? $context.link : $clipboard.link;
+
+if (!link) return;
 
 function decode(code, hexs) {
     const c = code.split(' ');
@@ -67,7 +71,7 @@ async function getHtml () {
     return new Promise(resolve => {
 
         $http.get({
-            url: url,
+            url: link,
             handler: function (resp) {
                 resolve(resp.data);
             }
