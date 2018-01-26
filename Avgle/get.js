@@ -110,11 +110,6 @@ async function getVideoInfo() {
                     make.size.equalTo($size(0, 0));
                 },
                 events: {
-                    didFinish: function(sender, navigation) {
-                        sender.eval({
-                            script: '$notify("params", document.body.innerHTML)'
-                        });
-                    },
                     build (data) {
                         let vInfo = {}, params = data.match(/\?(.*)/)[1];
                         params = params.split('&');
