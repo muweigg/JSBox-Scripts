@@ -6,7 +6,7 @@ link = link.length > 0 ? link[0] : $context.link ? $context.link : $clipboard.li
 
 if (!link) return;
 
-function decode(code, hexs, condition) {
+function decode(code) {
     const c = code.split(' ');
     let kode = '', ohash = '', hash = '', ts = 0, vid = 0;
 
@@ -23,50 +23,15 @@ function decode(code, hexs, condition) {
         .filter(v => !/video-info/.test(v))
         .map(v => v.replace(/\\?"/g, ''));
 
-    ohash = $text.base64Decode((kode[0]));
+    // ohash = $text.base64Decode((kode[0]));
+    ohash = kode[0];
     ts = kode[1];
     vid = kode[2];
 
-    for (let i = 0; i < ohash.length; i++) {
-        let ai = -1;
-        for (let j = 0; j < hexs.length; j++) {
-            let hex = hexs[j];
-            if (i > hex && i % hex == condition) {
-                ai = i / hex;
-                break;
-            }
-        }
-        if (ai === -1) ai = i;
-        charCode = ohash.charCodeAt(i) ^ ai;
-        hash = String.fromCharCode(charCode) + hash;
-    }
-
-    hash = $text.base64Encode(hash);
-    
-    return { hash: hash, ohash: ohash, ts: ts, vid: vid };
+    return { ohash: ohash, ts: ts, vid: vid };
 }
 
-async function getHexs (html) {
-
-    const keyScript = html.match(/\/templates.*avgle-main-ah\.js\?.*?"/)[0].replace('"', '');
-
-    return new Promise(resolve => {
-
-        $http.get({
-            url: `${host}${keyScript}`,
-            handler: function(resp) {
-                let hexs = resp.data.match(/\$\(function[\s\S]*?var[\s\S]*?=(\[0x.*?\])/)[1],
-                    condition = resp.data.match(/\$\(function[\s\S]*?if.*?%.*?===(.*?)\)/)[1];
-                hexs = eval(hexs).reverse();
-                condition = eval(condition);
-                resolve({ hexs, condition });
-            }
-        });
-
-    });
-}
-
-async function getHtml () {
+async function getHtml() {
 
     return new Promise(resolve => {
 
@@ -80,19 +45,93 @@ async function getHtml () {
     });
 }
 
-async function getVideoInfo () {
-    const html = await getHtml();
-    const params = await getHexs(html);
+function getScripts(ohtml) {
 
-    const script = html.match(/<script\s*?id=.*?>[\s\S]*?<\/script>/)[0],
-        code = script.match(/\\"([\d\s])*?\\"/)[0].match(/\\"(.*?)\\"/)[1];
+    let scripts = [
+        ohtml.match(/\/templates.*promise.*?\.js\??.*?"/)[0].replace('"', ''),
+        ohtml.match(/\/templates.*runtime.*?\.js\??.*?"/)[0].replace('"', ''),
+        ohtml.match(/\/templates.*avgle-main-ah\.js\??.*?"/)[0].replace('"', '')
+    ];
 
-    const vInfo = decode(code, params.hexs, params.condition);
+    scripts = scripts.map(s => `<script src="${host}${s}"></script>`);
+    scripts.splice(0, 0, '<script src="https://cdnjs.cloudflare.com/ajax/libs/videojs-contrib-hls/5.9.0/videojs-contrib-hls.min.js"></script>');
+    scripts.splice(0, 0, '<script src="https://cdnjs.cloudflare.com/ajax/libs/video.js/5.20.3/video.min.js"></script>');
+    scripts.splice(0, 0, '<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>');
 
-    return vInfo;
+    return scripts;
 }
 
-async function test () {
+function getHtmlEnv(ohtml) {
+
+    const scripts = getScripts(ohtml);
+
+    const script = ohtml.match(/<script\s*?id=.*?>[\s\S]*?<\/script>/)[0],
+        code = script.match(/\\"([\d\s])*?\\"/)[0].match(/\\"(.*?)\\"/)[1];
+
+    const vInfo = decode(code);
+
+    const html = `
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+        </head>
+        <body>
+            <source id="video-info" data-ohash="${vInfo.ohash}" data-ts="${vInfo.ts}" data-vid="${vInfo.vid}">
+            <video id="video-player" src=""></video>
+            <script>var removedMessage = '';</script>
+            <script>!function(t){function r(i){if(n[i])return n[i].exports;var o=n[i]={exports:{},id:i,loaded:!1};return t[i].call(o.exports,o,o.exports,r),o.loaded=!0,o.exports}var n={};return r.m=t,r.c=n,r.p="",r(0)}([function(t,r){!function(t){t.hookAjax=function(t){function r(t){return function(){return this.hasOwnProperty(t+"_")?this[t+"_"]:this.xhr[t]}}function n(r){return function(n){var i=this.xhr,o=this;return 0!=r.indexOf("on")?void(this[r+"_"]=n):void(t[r]?i[r]=function(){t[r](o)||n.apply(i,arguments)}:i[r]=n)}}function i(r){return function(){var n=[].slice.call(arguments);if(!t[r]||!t[r].call(this,n,this.xhr))return this.xhr[r].apply(this.xhr,n)}}return window._ahrealxhr=window._ahrealxhr||XMLHttpRequest,XMLHttpRequest=function(){this.xhr=new window._ahrealxhr;for(var t in this.xhr){var o="";try{o=typeof this.xhr[t]}catch(t){}"function"===o?this[t]=i(t):Object.defineProperty(this,t,{get:r(t),set:n(t)})}},window._ahrealxhr},t.unHookAjax=function(){window._ahrealxhr&&(XMLHttpRequest=window._ahrealxhr),window._ahrealxhr=void 0}}(window)}]);</script>
+            <script>hookAjax({open:function(arg,xhr){if (arg[0] === "GET") {$notify('build', arg[1]);}}});</script>
+            ${scripts.join('')}
+        </body>
+        </html>
+    `;
+
+    return html;
+}
+
+async function getVideoInfo() {
+        
+    const ohtml = await getHtml();
+    const htmlEnv = getHtmlEnv(ohtml);
+
+    return new Promise(resolve => {
+
+        $ui.render({
+            props: {
+                title: ""
+            },
+            views: [{
+                type: "web",
+                props: {
+                    html: htmlEnv
+                },
+                layout: function (make, view) {
+                    make.size.equalTo($size(0, 0));
+                },
+                events: {
+                    didFinish: function(sender, navigation) {
+                        sender.eval({
+                            script: '$notify("params", document.body.innerHTML)'
+                        });
+                    },
+                    build (data) {
+                        let vInfo = {}, params = data.match(/\?(.*)/)[1];
+                        params = params.split('&');
+                        for (let i in params) {
+                            let v = params[i].split('=');
+                            vInfo[v[0]] = v[1];
+                        }
+                        resolve(vInfo);
+                    }
+                }
+            }]
+        })
+    });
+
+}
+
+async function test() {
     const vInfo = await getVideoInfo();
     $console.info(JSON.stringify(vInfo, null, 2));
     $http.get({
@@ -104,5 +143,6 @@ async function test () {
         }
     })
 }
+
 
 test();
