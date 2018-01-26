@@ -6,15 +6,13 @@ link = link.length > 0 ? link[0] : $context.link ? $context.link : $clipboard.li
 
 if (!link) return;
 
-function decode(code, hexs) {
+function decode(code, hexs, condition) {
     const c = code.split(' ');
     let kode = '', ohash = '', hash = '', ts = 0, vid = 0;
 
     for (var i = 0; i < c.length; i++) {
         kode += String.fromCharCode(parseInt(c[i]) - 3);
     }
-
-    kode = kode;
 
     try {
         while (kode.indexOf("getElementById('K_ID')") === -1)
@@ -33,7 +31,7 @@ function decode(code, hexs) {
         let ai = -1;
         for (let j = 0; j < hexs.length; j++) {
             let hex = hexs[j];
-            if (i > hex && i % hex == 0) {
+            if (i > hex && i % hex == condition) {
                 ai = i / hex;
                 break;
             }
@@ -45,21 +43,23 @@ function decode(code, hexs) {
 
     hash = $text.base64Encode(hash);
     
-    return { hash: hash, ts: ts, vid: vid };
+    return { hash: hash, ohash: ohash, ts: ts, vid: vid };
 }
 
 async function getHexs (html) {
 
-    const keyScript = html.match(/\/templates.*avgle-main-ah\.js\?\d+/)[0];
+    const keyScript = html.match(/\/templates.*avgle-main-ah\.js\?.*?"/)[0].replace('"', '');
 
     return new Promise(resolve => {
 
         $http.get({
             url: `${host}${keyScript}`,
             handler: function(resp) {
-                let hexs = resp.data.match(/\$\(function[\s\S]*?var[\s\S]*?=(\[0x.*?\])/)[1];
+                let hexs = resp.data.match(/\$\(function[\s\S]*?var[\s\S]*?=(\[0x.*?\])/)[1],
+                    condition = resp.data.match(/\$\(function[\s\S]*?if.*?%.*?===(.*?)\)/)[1];
                 hexs = eval(hexs).reverse();
-                resolve(hexs);
+                condition = eval(condition);
+                resolve({ hexs, condition });
             }
         });
 
@@ -82,12 +82,12 @@ async function getHtml () {
 
 async function getVideoInfo () {
     const html = await getHtml();
-    const hexs = await getHexs(html);
+    const params = await getHexs(html);
 
     const script = html.match(/<script\s*?id=.*?>[\s\S]*?<\/script>/)[0],
         code = script.match(/\\"([\d\s])*?\\"/)[0].match(/\\"(.*?)\\"/)[1];
 
-    const vInfo = decode(code, hexs);
+    const vInfo = decode(code, params.hexs, params.condition);
 
     return vInfo;
 }
