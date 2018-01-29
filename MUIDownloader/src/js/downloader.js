@@ -31,6 +31,7 @@ function initUI () {
                 type: 'web',
                 props: {
                     id: "rootWeb",
+                    bounces: false,
                     html: decodeURIComponent(`<!-- inject:template --><!-- endinject -->`)
                 },
                 layout: $layout.fill,

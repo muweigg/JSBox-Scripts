@@ -16,7 +16,11 @@ gulp.task('embed:vendors',
 );
 
 gulp.task('embed:js',
-    () => gulp.src('./src/js/embed/embed.js')
+    () => gulp.src([
+        './src/js/embed/**/*.js',
+        './src/js/embed/embed.js'
+    ])
+    .pipe(concat('embed.js'))
     .pipe(babel({
         presets: ['es2015']
     }))
