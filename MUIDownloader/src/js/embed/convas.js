@@ -1,279 +1,255 @@
-(function () {
+class GLParticleIcons {
 
-    var canvas, gl,
-        ratio,
-        cw,
-        ch,
-        drawType,
-        numLines = 100000;
-    var target = [];
-    var id;
+    constructor(canvasId, imageURLArr) {
+        this.canvas = document.createElement('canvas');
+        this.ctx = this.canvas.getContext('2d');
+        this.imageURLArr = imageURLArr;
+        this.id = 0;
+        this.canvasId = canvasId;
+        this.target = [];
+        this.gl = null;
+        this.ratio = null;
+        this.count = 0;
+        this.drawType = 0;
+        this.numLines = 100000;
+        this.perspectiveMatrix = null;
+        this.randomTargetXArr = [];
+        this.randomTargetYArr = [];
 
-    var imageURLArr = [
-        "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyhpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuNi1jMDE0IDc5LjE1Njc5NywgMjAxNC8wOC8yMC0wOTo1MzowMiAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENDIDIwMTQgKE1hY2ludG9zaCkiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6MkZFMjJEMkJDMEIzMTFFNDk3QjVBMTAxREExQ0VDMDQiIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6MkZFMjJEMkNDMEIzMTFFNDk3QjVBMTAxREExQ0VDMDQiPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDo4REYzNjRBMEMwODcxMUU0OTdCNUExMDFEQTFDRUMwNCIgc3RSZWY6ZG9jdW1lbnRJRD0ieG1wLmRpZDoyRkUyMkQyQUMwQjMxMUU0OTdCNUExMDFEQTFDRUMwNCIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/PlvYb9wAAAAGUExURf///wAAAFXC034AAAA9SURBVHjaYmBgxA8IyQ+YAgYIwKmAgYACBkoVQCUZcDoSoXmAFTDgUMCAAihWQJ4ViIgaAiE50hQwAAQYANtFA0B8Qd5JAAAAAElFTkSuQmCC",
-        "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyhpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuNi1jMDE0IDc5LjE1Njc5NywgMjAxNC8wOC8yMC0wOTo1MzowMiAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENDIDIwMTQgKE1hY2ludG9zaCkiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6OERGMzY0OUFDMDg3MTFFNDk3QjVBMTAxREExQ0VDMDQiIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6OERGMzY0OUJDMDg3MTFFNDk3QjVBMTAxREExQ0VDMDQiPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDo4REYzNjQ5OEMwODcxMUU0OTdCNUExMDFEQTFDRUMwNCIgc3RSZWY6ZG9jdW1lbnRJRD0ieG1wLmRpZDo4REYzNjQ5OUMwODcxMUU0OTdCNUExMDFEQTFDRUMwNCIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/Pl7ZhhsAAAAGUExURQAAAP///6XZn90AAACKSURBVHjatJMLDoAwCEPL/S+txn1oy5wxkRgz6xswYIhpCFzP+SKxL5IVwC3b3wGAOAem7MQrIItGQMQfgZRlfYoJBK/AjrEAWhTyz8Bo1hqwgrYNAmALYBNieYrwebI6QKIkQNutM8nKFrBP31IA0uAPHiTL8CS9wj5yeLpZUd9b7kVIa7sdAgwAD0gC9Rv7/iAAAAAASUVORK5CYII=",
-        "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyhpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuNi1jMDE0IDc5LjE1Njc5NywgMjAxNC8wOC8yMC0wOTo1MzowMiAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENDIDIwMTQgKE1hY2ludG9zaCkiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6NjJFMTJFMDNDMDg3MTFFNDk3QjVBMTAxREExQ0VDMDQiIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6NjJFMTJFMDRDMDg3MTFFNDk3QjVBMTAxREExQ0VDMDQiPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDo2MkUxMkUwMUMwODcxMUU0OTdCNUExMDFEQTFDRUMwNCIgc3RSZWY6ZG9jdW1lbnRJRD0ieG1wLmRpZDo2MkUxMkUwMkMwODcxMUU0OTdCNUExMDFEQTFDRUMwNCIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/PraO89QAAAAGUExURf///wAAAFXC034AAAB0SURBVHja1JNBDoAwCASH/3/aJjWx20XEeJLQC0wJLAGGRQzPHjNbWQOIB+O28ln8j4Arh/9ThCQvRAVcPcwQCLE2CeFAvAPoAFH1gE+RACrUBrBIIaKjYRVNAYpt2gbIgXyYXUOTqwV8Oa3O8VbISB4CDAD5rgK6RivR9wAAAABJRU5ErkJggg==",
-        "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyhpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuNi1jMDE0IDc5LjE1Njc5NywgMjAxNC8wOC8yMC0wOTo1MzowMiAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENDIDIwMTQgKE1hY2ludG9zaCkiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6OERGMzY0OTZDMDg3MTFFNDk3QjVBMTAxREExQ0VDMDQiIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6OERGMzY0OTdDMDg3MTFFNDk3QjVBMTAxREExQ0VDMDQiPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDo2MkUxMkUwOUMwODcxMUU0OTdCNUExMDFEQTFDRUMwNCIgc3RSZWY6ZG9jdW1lbnRJRD0ieG1wLmRpZDo2MkUxMkUwQUMwODcxMUU0OTdCNUExMDFEQTFDRUMwNCIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/Pvx8F64AAAAGUExURQAAAP///6XZn90AAAB7SURBVHjapJNBEsAgCAOT/3+6lzIGQiu2nER2okIENwHL8QIgogeg4UAUwExA62wSBcptElDqBkQuyrFMgJztAAcARgA/A8iPLcCSsF4q0AlIq9OuA0XXh7UmzuyIuWFuXfMcfMR4Mm2xxDmAAcB/AMGdwujzngOXAAMA5SMDBa3meuoAAAAASUVORK5CYII=",
-        "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyhpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuNi1jMDE0IDc5LjE1Njc5NywgMjAxNC8wOC8yMC0wOTo1MzowMiAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENDIDIwMTQgKE1hY2ludG9zaCkiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6NjJFMTJFMDdDMDg3MTFFNDk3QjVBMTAxREExQ0VDMDQiIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6NjJFMTJFMDhDMDg3MTFFNDk3QjVBMTAxREExQ0VDMDQiPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDo2MkUxMkUwNUMwODcxMUU0OTdCNUExMDFEQTFDRUMwNCIgc3RSZWY6ZG9jdW1lbnRJRD0ieG1wLmRpZDo2MkUxMkUwNkMwODcxMUU0OTdCNUExMDFEQTFDRUMwNCIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/Plm6FdEAAAAGUExURQAAAP///6XZn90AAAB1SURBVHjatJNJEoAgDAR7/v9pSxFJYYZ4kByZDtlRYWwCGO8ZQLOHJNdv6gRY6A2IyOTPDZADPUREyEMMZNKvErDW+1AAsA9QlaSqJMM0rb78IeyD178Csrr8nAvgtdXGv7VaLr7MLJLDcWpMknhOvx7vIcAAUr4CDsMhPIIAAAAASUVORK5CYII=",
-        "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyhpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuNi1jMDE0IDc5LjE1Njc5NywgMjAxNC8wOC8yMC0wOTo1MzowMiAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENDIDIwMTQgKE1hY2ludG9zaCkiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6OERGMzY0OUVDMDg3MTFFNDk3QjVBMTAxREExQ0VDMDQiIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6OERGMzY0OUZDMDg3MTFFNDk3QjVBMTAxREExQ0VDMDQiPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDo4REYzNjQ5Q0MwODcxMUU0OTdCNUExMDFEQTFDRUMwNCIgc3RSZWY6ZG9jdW1lbnRJRD0ieG1wLmRpZDo4REYzNjQ5REMwODcxMUU0OTdCNUExMDFEQTFDRUMwNCIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/PtDXafoAAAAGUExURQAAAP///6XZn90AAAB8SURBVHjarJNRDsAgCEPb+196W2KwVZQs2h8jvBC0ABbCHQBFDp+mbAsG4EgPCYD3IkcCzCoBXKqAAsBW58APhT/w3058YEIs7HZAuB7RAlIJShjus0IZgQJg3kMDuGuSAqTPjHlY5onhhfZLsjNibhg8rB4W5pwv7yPAACfoAh3Ikbd/AAAAAElFTkSuQmCC",
-    ]
-    var snsNameArr = ["Facebook", "Google+", "Instagram", "Pinterest", "Twitter", "GitHub"];
+        this.coefficient = .4;
+        this.targetCoefficient = .01;
 
-    var perspectiveMatrix;
-    var randomTargetXArr = [], randomTargetYArr = [];
-    drawType = 0;
-    var count = 0;
-
-    window.onload = init();
-
-    function init() {
-        var canvas = document.createElement("canvas");
-        var ctx = canvas.getContext('2d');
-
-        for (var ii = 0; ii < imageURLArr.length; ii++) {
-            var image = new Image();
-            image.crossOrigin = "Anonymous";
-            image.src = imageURLArr[ii];
-
-            image.onload = onLoadImageHandler.bind(this, image, canvas, ctx, ii);
+        for (let i = 0; i < this.imageURLArr.length; i++) {
+            const image = new Image();
+            image.src = imageURLArr[i];
+            image.onload = this.onLoadImageHandler.bind(this, image, this.canvas, this.ctx, i);
         }
-    };
-
-    function onLoadImageHandler(image, canvas, ctx, number) {
-        var size = image.width;
-        canvas.width = size;
-        canvas.height = size;
-
-        ctx.drawImage(image, 0, 0)
-        var imageData = ctx.getImageData(0, 0, size, size);
-
-        var data = imageData.data;
-        target[number] = [];
-
-        for (var ii = 0; ii < data.length; ii += 4) {
-            if (data[ii] == 0) {
-                var pixNumber = ii / 4;
-                var xPos = pixNumber % size;
-                var yPos = parseInt(pixNumber / size);
-                var pos = { x: xPos / size - .5, y: -yPos / size + 0.5 };
-                target[number].push(pos);
-            }
-
-        }
-
-        count++;
-
-        if (count == imageURLArr.length) loadScene();
     }
 
-    function loadScene() {
-        canvas = document.getElementById("c");
-        gl = canvas.getContext("experimental-webgl");
+    onLoadImageHandler(image, canvas, ctx, number) {
+        const size = image.width;
+        this.canvas.width = size;
+        this.canvas.height = size;
 
-        if (!gl) {
+        this.ctx.drawImage(image, 0, 0);
+        const imageData = this.ctx.getImageData(0, 0, size, size);
+
+        const data = imageData.data;
+        this.target[number] = [];
+
+        for (let i = 0; i < data.length; i += 4) {
+            if (data[i] == 0) {
+                let pixNumber = i / 4;
+                let xPos = pixNumber % size;
+                let yPos = parseInt(pixNumber / size);
+                let pos = { x: xPos / size - .5, y: -yPos / size + 0.5 };
+                this.target[number].push(pos);
+            }
+        }
+
+        this.count++;
+
+        if (this.count == this.imageURLArr.length) this.loadScene();
+    }
+
+
+    loadScene () {
+        this.canvas = document.getElementById(this.canvasId);
+        this.gl = this.canvas.getContext("experimental-webgl");
+
+        if (!this.gl) {
             alert("There's no WebGL context available.");
             return;
         }
 
-        cw = window.innerWidth;
-        ch = window.innerHeight;
-        canvas.width = cw;
-        canvas.height = ch;
-        gl.viewport(0, 0, canvas.width, canvas.height);
+        let cw = window.innerWidth;
+        let ch = window.innerHeight;
+        this.canvas.width = cw;
+        this.canvas.height = ch;
+        this.gl.viewport(0, 0, this.canvas.width, this.canvas.height);
 
-        var vertexShaderScript = document.getElementById("shader-vs");
-        var vertexShader = gl.createShader(gl.VERTEX_SHADER);
-        gl.shaderSource(vertexShader, vertexShaderScript.text);
-        gl.compileShader(vertexShader);
-        if (!gl.getShaderParameter(vertexShader, gl.COMPILE_STATUS)) {
+        let vertexShaderScript = document.getElementById("shader-vs");
+        let vertexShader = this.gl.createShader(this.gl.VERTEX_SHADER);
+        this.gl.shaderSource(vertexShader, vertexShaderScript.text);
+        this.gl.compileShader(vertexShader);
+
+        if (!this.gl.getShaderParameter(vertexShader, this.gl.COMPILE_STATUS)) {
             alert("Couldn't compile the vertex shader");
-            gl.deleteShader(vertexShader);
+            this.gl.deleteShader(vertexShader);
             return;
         }
 
-        var fragmentShaderScript = document.getElementById("shader-fs");
-        var fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
-        gl.shaderSource(fragmentShader, fragmentShaderScript.text);
-        gl.compileShader(fragmentShader);
-        if (!gl.getShaderParameter(fragmentShader, gl.COMPILE_STATUS)) {
+        let fragmentShaderScript = document.getElementById("shader-fs");
+        let fragmentShader = this.gl.createShader(this.gl.FRAGMENT_SHADER);
+        this.gl.shaderSource(fragmentShader, fragmentShaderScript.text);
+        this.gl.compileShader(fragmentShader);
+
+        if (!this.gl.getShaderParameter(fragmentShader, this.gl.COMPILE_STATUS)) {
             alert("Couldn't compile the fragment shader");
-            gl.deleteShader(fragmentShader);
+            this.gl.deleteShader(fragmentShader);
             return;
         }
 
-        gl.program = gl.createProgram();
-        gl.attachShader(gl.program, vertexShader);
-        gl.attachShader(gl.program, fragmentShader);
-        gl.linkProgram(gl.program);
-        if (!gl.getProgramParameter(gl.program, gl.LINK_STATUS)) {
+        this.gl.program = this.gl.createProgram();
+        this.gl.attachShader(this.gl.program, vertexShader);
+        this.gl.attachShader(this.gl.program, fragmentShader);
+        this.gl.linkProgram(this.gl.program);
+
+        if (!this.gl.getProgramParameter(this.gl.program, this.gl.LINK_STATUS)) {
             alert("Unable to initialise shaders");
-            gl.deleteProgram(gl.program);
-            gl.deleteProgram(vertexShader);
-            gl.deleteProgram(fragmentShader);
+            this.gl.deleteProgram(this.gl.program);
+            this.gl.deleteProgram(vertexShader);
+            this.gl.deleteProgram(fragmentShader);
             return;
         }
-        gl.useProgram(gl.program);
-        var vertexPosition = gl.getAttribLocation(gl.program, "vertexPosition");
-        gl.enableVertexAttribArray(vertexPosition);
-        gl.clearColor(0.0, 0.0, 0.0, 1.0);
-        gl.clearDepth(1.0);
 
-        gl.enable(gl.BLEND);
-        gl.disable(gl.DEPTH_TEST);
-        gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
+        this.gl.useProgram(this.gl.program);
+        let vertexPosition = this.gl.getAttribLocation(this.gl.program, "vertexPosition");
+        this.gl.enableVertexAttribArray(vertexPosition);
+        this.gl.clearColor(0.0, 0.0, 0.0, 1.0);
+        this.gl.clearDepth(1.0);
 
-        var vertexBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
+        this.gl.enable(this.gl.BLEND);
+        this.gl.disable(this.gl.DEPTH_TEST);
+        this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE);
 
-        setup();
+        let vertexBuffer = this.gl.createBuffer();
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, vertexBuffer);
 
-        gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.DYNAMIC_DRAW);
+        this.setup();
 
-        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-        var fieldOfView = 30.0;
-        var aspectRatio = canvas.width / canvas.height;
-        var nearPlane = 1.0;
-        var farPlane = 10000.0;
-        var top = nearPlane * Math.tan(fieldOfView * Math.PI / 360.0);
-        var bottom = -top;
-        var right = top * aspectRatio;
-        var left = -right;
+        this.gl.bufferData(this.gl.ARRAY_BUFFER, this.vertices, this.gl.DYNAMIC_DRAW);
 
-        var a = (right + left) / (right - left);
-        var b = (top + bottom) / (top - bottom);
-        var c = (farPlane + nearPlane) / (farPlane - nearPlane);
-        var d = (2 * farPlane * nearPlane) / (farPlane - nearPlane);
-        var x = (2 * nearPlane) / (right - left);
-        var y = (2 * nearPlane) / (top - bottom);
-        perspectiveMatrix = [
+        this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
+        let fieldOfView = 30.0;
+        let aspectRatio = this.canvas.width / this.canvas.height;
+        let nearPlane = 1.0;
+        let farPlane = 10000.0;
+        let top = nearPlane * Math.tan(fieldOfView * Math.PI / 360.0);
+        let bottom = -top;
+        let right = top * aspectRatio;
+        let left = -right;
+
+        let a = (right + left) / (right - left);
+        let b = (top + bottom) / (top - bottom);
+        let c = (farPlane + nearPlane) / (farPlane - nearPlane);
+        let d = (2 * farPlane * nearPlane) / (farPlane - nearPlane);
+        let x = (2 * nearPlane) / (right - left);
+        let y = (2 * nearPlane) / (top - bottom);
+
+        this.perspectiveMatrix = [
             x, 0, a, 0,
             0, y, b, 0,
             0, 0, c, d,
             0, 0, -1, 0
         ];
 
-        var modelViewMatrix = [
+        let modelViewMatrix = [
             1, 0, 0, 0,
             0, 1, 0, 0,
             0, 0, 1, 0,
             0, 0, 0, 1
         ];
-        var vertexPosAttribLocation = gl.getAttribLocation(gl.program, "vertexPosition");
-        gl.vertexAttribPointer(vertexPosAttribLocation, 3.0, gl.FLOAT, false, 0, 0);
-        var uModelViewMatrix = gl.getUniformLocation(gl.program, "modelViewMatrix");
-        var uPerspectiveMatrix = gl.getUniformLocation(gl.program, "perspectiveMatrix");
-        gl.uniformMatrix4fv(uModelViewMatrix, false, new Float32Array(perspectiveMatrix));
-        gl.uniformMatrix4fv(uPerspectiveMatrix, false, new Float32Array(modelViewMatrix));
-        animate();
+
+        let vertexPosAttribLocation = this.gl.getAttribLocation(this.gl.program, "vertexPosition");
+        this.gl.vertexAttribPointer(vertexPosAttribLocation, 3.0, this.gl.FLOAT, false, 0, 0);
+        let uModelViewMatrix = this.gl.getUniformLocation(this.gl.program, "modelViewMatrix");
+        let uPerspectiveMatrix = this.gl.getUniformLocation(this.gl.program, "perspectiveMatrix");
+        this.gl.uniformMatrix4fv(uModelViewMatrix, false, new Float32Array(this.perspectiveMatrix));
+        this.gl.uniformMatrix4fv(uPerspectiveMatrix, false, new Float32Array(modelViewMatrix));
+
+        this.animate();
+
+        this.count = 0;
+        this.cn = 0;
     }
-    var count = 0;
-    var cn = 0;
-
-    function animate() {
-
-        id = requestAnimationFrame(animate);
-        drawScene();
-    }
-
-
-    function drawScene() {
-        draw();
-
-        gl.lineWidth(1);
-        gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.DYNAMIC_DRAW);
-
-        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-
-        gl.drawArrays(gl.LINES, 0, numLines);
-
-        gl.flush();
+    
+    animate () {
+        this.id = requestAnimationFrame(this.animate.bind(this));
+        this.drawScene();
     }
 
-    var coefficient = .4;
-    var targetCoefficient = .01;
+    drawScene () {
+        this.draw();
+        this.gl.lineWidth(1);
+        this.gl.bufferData(this.gl.ARRAY_BUFFER, this.vertices, this.gl.DYNAMIC_DRAW);
+        this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
+        this.gl.drawArrays(this.gl.LINES, 0, this.numLines);
+        this.gl.flush();
+    }
 
-    var vertices,
-        velocities,
-        freqArr,
-        thetaArr,
-        velThetaArr,
-        velRadArr,
-        boldRateArr;
+    setup () {
 
-    function setup() {
+        this.vertices = [];
 
-        vertices = [];
+        for (let i = 0; i < this.numLines; i++) {
+            this.vertices.push(0, 0, 1.83);
+            this.vertices.push(0, 0, 1.83);
 
-        for (var ii = 0; ii < numLines; ii++) {
-            vertices.push(0, 0, 1.83);
-            vertices.push(0, 0, 1.83);
-
-            var randomPos = target[drawType][parseInt(target[drawType].length * Math.random())];
-            randomTargetXArr.push(randomPos.x);
-            randomTargetYArr.push(randomPos.y);
+            let randomPos = this.target[this.drawType][parseInt(this.target[this.drawType].length * Math.random())];
+            this.randomTargetXArr.push(randomPos.x);
+            this.randomTargetYArr.push(randomPos.y);
         }
 
-        vertices = new Float32Array(vertices);
-        randomTargetXArr = new Float32Array(randomTargetXArr);
-        randomTargetYArr = new Float32Array(randomTargetYArr);
-
+        this.vertices = new Float32Array(this.vertices);
+        this.randomTargetXArr = new Float32Array(this.randomTargetXArr);
+        this.randomTargetYArr = new Float32Array(this.randomTargetYArr);
     }
+    
+    draw () {
+        this.cn += .1;
 
-    function draw() {
-        cn += .1;
+        let i, n = this.vertices.length, p, bp;
+        let px, py;
+        let pTheta;
+        let rad;
+        let num;
 
-        var i, n = vertices.length, p, bp;
-        var px, py;
-        var pTheta;
-        var rad;
-        var num;
+        this.coefficient += (this.targetCoefficient - this.coefficient) * .1;
 
-        coefficient += (targetCoefficient - coefficient) * .1;
-
-
-        for (i = 0; i < numLines * 2; i += 2) {
-            count += .3;
+        for (i = 0; i < this.numLines * 2; i += 2) {
+            this.count += .3;
             bp = i * 3;
 
-            vertices[bp] = vertices[bp + 3];
-            vertices[bp + 1] = vertices[bp + 4];
+            this.vertices[bp] = this.vertices[bp + 3];
+            this.vertices[bp + 1] = this.vertices[bp + 4];
 
             num = parseInt(i / 2);
-            var targetPosX = randomTargetXArr[num];
-            var targetPosY = randomTargetYArr[num];
+            let targetPosX = this.randomTargetXArr[num];
+            let targetPosY = this.randomTargetYArr[num];
 
-            px = vertices[bp + 3];
-            px += (targetPosX - px) * coefficient + (Math.random() - .5) * coefficient;
-            vertices[bp + 3] = px;
+            px = this.vertices[bp + 3];
+            px += (targetPosX - px) * this.coefficient + (Math.random() - .5) * this.coefficient;
+            this.vertices[bp + 3] = px;
 
 
-            py = vertices[bp + 4];
-            py += (targetPosY - py) * coefficient + (Math.random() - .5) * coefficient;
-            vertices[bp + 4] = py;
+            py = this.vertices[bp + 4];
+            py += (targetPosY - py) * this.coefficient + (Math.random() - .5) * this.coefficient;
+            this.vertices[bp + 4] = py;
         }
     }
 
-    window.addEventListener("touchstart", function (event) {
-        var rotate;
-        var transY;
+    change () {
+        
+        let rotate;
+        let transY;
 
-        drawType = (drawType + 1) % imageURLArr.length;
+        this.drawType = (this.drawType + 1) % this.imageURLArr.length;
         rotate = 90;
         transY = -15;
 
-        coefficient = .3;
-        randomTargetXArr = [];
-        randomTargetYArr = [];
+        this.coefficient = .3;
+        this.randomTargetXArr = [];
+        this.randomTargetYArr = [];
 
-        for (var ii = 0; ii < numLines; ii++) {
-            var randomPos = target[drawType][parseInt(target[drawType].length * Math.random())];
-            randomTargetXArr.push(randomPos.x);
-            randomTargetYArr.push(randomPos.y);
+        for (let i = 0; i < this.numLines; i++) {
+            let randomPos = this.target[this.drawType][parseInt(this.target[this.drawType].length * Math.random())];
+            this.randomTargetXArr.push(randomPos.x);
+            this.randomTargetYArr.push(randomPos.y);
         }
 
-        vertices = new Float32Array(vertices);
-        randomTargetXArr = new Float32Array(randomTargetXArr);
-        randomTargetYArr = new Float32Array(randomTargetYArr);
-    });
-
-}());
+        this.vertices = new Float32Array(vertices);
+        this.randomTargetXArr = new Float32Array(this.randomTargetXArr);
+        this.randomTargetYArr = new Float32Array(this.randomTargetYArr);
+    }
+}
