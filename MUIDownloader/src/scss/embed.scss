@@ -1,3 +1,8 @@
+$fontSize: 14pt;
+$linkText: #fff;
+$linkBgc: rgba(66,66,66,.5);
+
+
 html, body {
     margin:0;
     padding:0;
@@ -8,5 +13,28 @@ html, body {
 body {
     display: flex;
     flex-flow: column nowrap;
-    font-size: 12px;
+    font-family: "Helvetica Neue", Helvetica, Arial, "PingFang SC", "Hiragino Sans GB", "Heiti SC", sans-serif;
+    font-size: $fontSize;
+
+    #app {
+        flex: 1 0 auto;
+        display: flex;
+        flex-flow: column nowrap;
+        background-color: #DD2C00;
+
+        > .link {
+            border: 0;
+            margin: 10pt 10pt 0;
+            height: 30pt;
+            line-height: 30pt;
+            padding: 0 10pt;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            border-radius: 5pt;
+            background-color: $linkBgc;
+            color: $linkText;
+            // box-shadow: 0 0 5pt 1pt rgba(117,117,117,0.5);
+        }
+    }
 }

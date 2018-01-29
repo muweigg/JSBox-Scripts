@@ -10,9 +10,13 @@ link = $detector.link($context.text).map(link => {
     if (/youtu(\.?be)?|tumblr/.test(link))
         return link;
 });
+
 link = link.length > 0 ? link[0] : $context.link ? $context.link : $clipboard.link;
 
+// if (!link) return;
+
 function initUI () {
+
     $ui.render({
         props: {
             title: "MUI Downloader"
@@ -33,7 +37,10 @@ function initUI () {
                 events: {
                     exec (data) {
                         $console.info("exec");
-                        eval(`${data.func}();`);
+                        $console.info(JSON.stringify(data, null,2 ));
+                        const func = eval(`${data.func}`);
+                        if (data.params) func(data.params);
+                        else func();
                     },
                     debug (data) {
                         $console.info(data);
