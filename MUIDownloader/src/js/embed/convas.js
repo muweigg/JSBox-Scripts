@@ -4,7 +4,6 @@
         ratio,
         cw,
         ch,
-        colorLoc,
         drawType,
         numLines = 100000;
     var target = [];
