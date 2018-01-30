@@ -10,6 +10,7 @@ const base64Icons = {
     'twitter': Twitter,
 };
 
+let previewVideo = null;
 const vw = window.innerWidth - 50;
 
 const vm = new Vue({
@@ -23,10 +24,13 @@ const vm = new Vue({
         }
     },
     mounted: function() {
-        initCanvas();
-        /* this.$nextTick(function() {
+        this.$nextTick(function(){
+            initCanvas();
+            previewVideo = document.querySelector('#previewVideo');
+        });
+        this.$nextTick(function() {
             $notify('exec', { func: 'ready' });
-        }); */
+        });
     }
 });
 
@@ -40,6 +44,12 @@ function initCanvas () {
     window.addEventListener("click", function (event) {
         glpi.change();
     });
+}
+
+function updateVideo (v) {
+    previewVideo.poster = v.poster;
+    previewVideo.src = v.src;
+    previewVideo.play();
 }
 
 // $notify('debug', 'is ok');

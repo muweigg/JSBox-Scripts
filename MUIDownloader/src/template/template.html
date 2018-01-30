@@ -37,11 +37,8 @@
         <div class="link">{{ link }}</div>
         <main>
             <div class="video-download expand">
-                <video controls
-                    poster="http://i0.hdslb.com/bfs/archive/d00c2fc8666d03abb29eee5bdb43bedd4942e4d8.jpg"
-                    :style="{ width: vw + 'px', height: vh + 'px' }">
-                    <source src="http://vo.fod4.com/v/25c17d6eb2/v600.mp4" type="video/mp4">
-                </video>
+                <video id="previewVideo" controls
+                    :style="{ width: vw + 'px', height: vh + 'px' }"></video>
                 <span class="parsing">Parsing...</span>
             </div>
         </main>

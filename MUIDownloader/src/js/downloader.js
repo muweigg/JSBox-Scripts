@@ -58,6 +58,15 @@ function initUI () {
 function ready() {
     $console.info('ready');
     rootWeb.eval({ script: `vm.link = '${link}';` });
+
+    const video = {
+        poster: 'http://i0.hdslb.com/bfs/archive/d00c2fc8666d03abb29eee5bdb43bedd4942e4d8.jpg',
+        src: 'http://download.blender.org/peach/bigbuckbunny_movies/BigBuckBunny_320x180.mp4'
+    };
+
+    $delay(2, function() {
+        rootWeb.eval({ script: `updateVideo(${JSON.stringify(video)})` });
+    });
 }
 
 initUI();
