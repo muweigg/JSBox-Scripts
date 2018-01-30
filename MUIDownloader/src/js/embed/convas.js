@@ -52,7 +52,6 @@ class GLParticleIcons {
         if (this.count == this.imageURLArr.length) this.loadScene();
     }
 
-
     loadScene () {
         this.canvas = document.getElementById(this.canvasId);
         this.gl = this.canvas.getContext("experimental-webgl");
@@ -179,7 +178,6 @@ class GLParticleIcons {
     }
 
     setup () {
-
         this.vertices = [];
 
         for (let i = 0; i < this.numLines; i++) {
@@ -199,11 +197,7 @@ class GLParticleIcons {
     draw () {
         this.cn += .1;
 
-        let i, n = this.vertices.length, p, bp;
-        let px, py;
-        let pTheta;
-        let rad;
-        let num;
+        let i, bp, px, py, num;
 
         this.coefficient += (this.targetCoefficient - this.coefficient) * .1;
 
@@ -222,7 +216,6 @@ class GLParticleIcons {
             px += (targetPosX - px) * this.coefficient + (Math.random() - .5) * this.coefficient;
             this.vertices[bp + 3] = px;
 
-
             py = this.vertices[bp + 4];
             py += (targetPosY - py) * this.coefficient + (Math.random() - .5) * this.coefficient;
             this.vertices[bp + 4] = py;
@@ -230,13 +223,13 @@ class GLParticleIcons {
     }
 
     change () {
-        
-        let rotate;
-        let transY;
+        let rotate, transY;
 
         this.drawType = (this.drawType + 1) % this.imageURLArr.length;
         rotate = 90;
         transY = -15;
+
+        console.log('drawType: ', this.drawType);
 
         this.coefficient = .3;
         this.randomTargetXArr = [];
@@ -248,7 +241,7 @@ class GLParticleIcons {
             this.randomTargetYArr.push(randomPos.y);
         }
 
-        this.vertices = new Float32Array(vertices);
+        this.vertices = new Float32Array(this.vertices);
         this.randomTargetXArr = new Float32Array(this.randomTargetXArr);
         this.randomTargetYArr = new Float32Array(this.randomTargetYArr);
     }
