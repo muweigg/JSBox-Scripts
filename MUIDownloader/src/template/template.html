@@ -37,8 +37,13 @@
         <div class="link">{{ link }}</div>
         <main>
             <div class="video-download expand">
-                <video id="previewVideo" controls
-                    :style="{ width: vw + 'px', height: vh + 'px' }"></video>
+                <template v-if="video">
+                    <video controls
+                        :poster="video.poster"
+                        :style="{ width: vw + 'px', height: vh + 'px' }">
+                        <source :src="video.src" :type="'video/' + video.ext">
+                    </video>
+                </template>
                 <span class="parsing">Parsing...</span>
             </div>
         </main>

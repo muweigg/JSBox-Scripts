@@ -10,7 +10,7 @@ const base64Icons = {
     'twitter': Twitter,
 };
 
-let previewVideo = null;
+// let previewVideo = null;
 const vw = window.innerWidth - 50;
 
 const vm = new Vue({
@@ -19,6 +19,7 @@ const vm = new Vue({
         link: 'https://youtu.be/Xg7tcni_6-4',
         vw: vw,
         vh: Math.floor(vw * 9 / 16),
+        video: null,
         app: {
             title: 'MUI Downloader'
         }
@@ -26,7 +27,6 @@ const vm = new Vue({
     mounted: function() {
         this.$nextTick(function(){
             initCanvas();
-            previewVideo = document.querySelector('#previewVideo');
         });
         this.$nextTick(function() {
             $notify('exec', { func: 'ready' });
@@ -46,10 +46,11 @@ function initCanvas () {
     });
 }
 
-function updateVideo (v) {
-    previewVideo.poster = v.poster;
-    previewVideo.src = v.src;
-    previewVideo.play();
-}
-
+// setTimeout(() => {
+//     vm.video = {
+//         poster: 'http://i0.hdslb.com/bfs/archive/d00c2fc8666d03abb29eee5bdb43bedd4942e4d8.jpg',
+//         src: 'http://download.blender.org/peach/bigbuckbunny_movies/BigBuckBunny_320x180.mp4',
+//         ext: 'mp4',
+//     };
+// }, 2000);
 // $notify('debug', 'is ok');
