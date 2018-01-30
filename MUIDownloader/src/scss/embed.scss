@@ -1,6 +1,6 @@
 $fontSize: 14pt;
-$linkText: #fff;
-$linkBgc: rgba(66,66,66,.5);
+$bgc: rgba(255, 255, 255,.1);
+$textColor: rgba(255,255,255,.5);
 
 
 html, body {
@@ -28,7 +28,6 @@ body {
         display: flex;
         flex-flow: column nowrap;
         padding: 10pt;
-        // background-color: #DD2C00;
 
         > .link {
             height: 30pt;
@@ -38,16 +37,50 @@ body {
             text-overflow: ellipsis;
             overflow: hidden;
             border-radius: 5pt;
-            background-color: $linkBgc;
-            color: $linkText;
+            background-color: $bgc;
+            color: $textColor;
             // box-shadow: 0 0 5pt 1pt rgba(117,117,117,0.5);
         }
 
-        > .video-box {
-            flex: 1 0 auto;
+        main {
             margin-top: 10pt;
-            background-color: rgba(255,255,255,.1);
-            border-radius: 5pt;
+            flex: 1 0 auto;
+            display: flex;
+            flex-flow: column nowrap;
+            align-items: center;
+            justify-content: center;
+
+            .video-download {
+                background-color: $bgc;
+                display: inline-block;
+                border-radius: 5pt;
+                min-height: auto;
+                transition: all .3s ease-out;
+                margin-top: -50pt;
+                overflow-x: hidden;
+                overflow-y: auto;
+
+                video {
+                    display: block;
+                    margin: 10pt auto 0;
+                }
+
+                .parsing {
+                    display: inline-block;
+                    padding: 5pt 10pt;
+                    color: $textColor;
+                }
+
+                &.expand {
+                    margin-top: 0;
+                    flex: 1 0 100%;
+                    width: 100%;
+
+                    .parsing {
+                        display: none;
+                    }
+                }
+            }
         }
     }
 }
