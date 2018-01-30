@@ -28,8 +28,10 @@ class GLParticleIcons {
 
     onLoadImageHandler(image, canvas, ctx, number) {
         const size = image.width;
-        this.canvas.width = size;
-        this.canvas.height = size;
+        // this.canvas.width = size;
+        // this.canvas.height = size;
+        this.canvas.width = 32;
+        this.canvas.height = 32;
 
         this.ctx.drawImage(image, 0, 0);
         const imageData = this.ctx.getImageData(0, 0, size, size);
@@ -65,7 +67,7 @@ class GLParticleIcons {
         let ch = window.innerHeight;
         this.canvas.width = cw;
         this.canvas.height = ch;
-        this.gl.viewport(0, 0, this.canvas.width, this.canvas.height);
+        this.gl.viewport(0, 0, this.canvas.width + 10, this.canvas.height);
 
         let vertexShaderScript = document.getElementById("shader-vs");
         let vertexShader = this.gl.createShader(this.gl.VERTEX_SHADER);
@@ -228,8 +230,6 @@ class GLParticleIcons {
         this.drawType = (this.drawType + 1) % this.imageURLArr.length;
         rotate = 90;
         transY = -15;
-
-        console.log('drawType: ', this.drawType);
 
         this.coefficient = .3;
         this.randomTargetXArr = [];
