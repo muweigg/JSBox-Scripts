@@ -37,14 +37,37 @@
         <div class="link">{{ link }}</div>
         <main>
             <div class="video-download expand">
-                <template v-if="video">
-                    <video controls
-                        :poster="video.poster"
-                        :style="{ width: vw + 'px', height: vh + 'px' }">
-                        <source :src="video.src" :type="'video/' + video.ext">
-                    </video>
-                </template>
-                <span class="parsing">Parsing...</span>
+                <div class="video-download-wrap">
+                    <transition name="fade">
+                        <template v-if="video">
+                            <video controls
+                                ref="v"
+                                :poster="video.poster"
+                                :class="{ playing: video.play }"
+                                :style="{ width: vw + 'px', height: vh + 'px' }">
+                                <source :src="video.url" :type="'video/' + video.type">
+                            </video>
+                        </template>
+                    </transition>
+                    <div class="video-title">
+                        蟻人與黃蜂女 | HD中文電影前導預告 (Ant-Man and the Wasp)
+                    </div>
+                    <div class="download-list">
+                        <section>
+                            <header>Video + Audio:</header>
+                            <div>720p<span class="mp4">mp4</span></div>
+                            <div>360p<span class="webm">webm</span></div>
+                            <div>360p<span class="v3gp">3gp</span></div>
+                        </section>
+                        <section>
+                            <header>High Quality: (Merge Audio online)</header>
+                            <div>1080p<span class="webm">webm</span></div>
+                            <div>480p<span class="webm">webm</span></div>
+                            <div>Base<span class="mp3">mp3</span></div>
+                        </section>
+                    </div>
+                    <span class="parsing">Parsing...</span>
+                </div>
             </div>
         </main>
     </div>

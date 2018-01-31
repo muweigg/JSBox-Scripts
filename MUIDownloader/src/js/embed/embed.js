@@ -10,8 +10,7 @@ const base64Icons = {
     'twitter': Twitter,
 };
 
-// let previewVideo = null;
-const vw = window.innerWidth - 50;
+const vw = window.innerWidth - 54;
 
 const vm = new Vue({
     el: '#app',
@@ -20,17 +19,17 @@ const vm = new Vue({
         vw: vw,
         vh: Math.floor(vw * 9 / 16),
         video: null,
-        app: {
-            title: 'MUI Downloader'
-        }
     },
     mounted: function() {
         this.$nextTick(function(){
             initCanvas();
-        });
-        this.$nextTick(function() {
             $notify('exec', { func: 'ready' });
         });
+    },
+    watch: {
+        video (val) {
+            if (val) initVideoEvents();
+        }
     }
 });
 
@@ -41,16 +40,22 @@ function initCanvas () {
         base64Icons['twitter'],
     ]);
 
-    window.addEventListener("click", function (event) {
-        glpi.change();
+    window.addEventListener("touchstart", function (event) { glpi.change(); });
+}
+
+function initVideoEvents () {
+    Vue.nextTick(function(){
+        vm.$refs.v.addEventListener('play', () => { vm.video.play = true; }, false);
+        vm.$refs.v.addEventListener('pause', () => { vm.video.play = false; }, false);
     });
 }
 
 // setTimeout(() => {
 //     vm.video = {
 //         poster: 'http://i0.hdslb.com/bfs/archive/d00c2fc8666d03abb29eee5bdb43bedd4942e4d8.jpg',
-//         src: 'http://download.blender.org/peach/bigbuckbunny_movies/BigBuckBunny_320x180.mp4',
-//         ext: 'mp4',
+//         url: 'http://download.blender.org/peach/bigbuckbunny_movies/BigBuckBunny_320x180.mp4',
+//         type: 'mp4',
+//         play: false
 //     };
 // }, 2000);
 // $notify('debug', 'is ok');

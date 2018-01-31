@@ -22,9 +22,9 @@ gulp.task('embed:js',
     ])
     .pipe(concat('embed.js'))
     .pipe(babel({
-        presets: ['es2015']
+        presets: ['es2015', 'minify']
     }))
-    .pipe(uglify())
+    // .pipe(uglify())
     .pipe(gulp.dest('./tmp'))
 );
 
@@ -59,17 +59,21 @@ gulp.task('template',
 gulp.task('build:template', gulp.series(gulp.parallel('embed:vendors', 'embed:js', 'embed:css'), 'template'));
 
 gulp.task('build',
-    () => gulp.src('./src/js/downloader.js')
+    () => gulp.src([
+            './src/js/downloader.js',
+            './src/js/*.js',
+        ])
+        .pipe(concat('downloader.js'))
         .pipe(inject(gulp.src(['./tmp/template.html']), {
             starttag: '<!-- inject:template -->',
             transform: function (filePath, file) {
                 return encodeURIComponent(file.contents.toString('utf8'));
             }
         }))
-        .pipe(babel({
-            presets: ['es2015']
-        }))
-        .pipe(uglify())
+        // .pipe(babel({
+        //     presets: ['minify']
+        // }))
+        // .pipe(uglify())
         .pipe(gulp.dest('./dist'))
 );
 
