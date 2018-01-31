@@ -70,9 +70,9 @@ gulp.task('build',
                 return encodeURIComponent(file.contents.toString('utf8'));
             }
         }))
-        // .pipe(babel({
-        //     presets: ['minify']
-        // }))
+        .pipe(babel({
+            presets: ['minify']
+        }))
         // .pipe(uglify())
         .pipe(gulp.dest('./dist'))
 );

@@ -65,19 +65,19 @@ function initUI () {
 
 async function ready() {
     $console.info('ready');
+    $console.info(link);
     rootWeb.eval({ script: `vm.link = '${link}';` });
 
     if (/youtu(\.?be)?/.test(link)) {
-        $console.info('youtube');
         const video = await analysisYouTubeVideoByLink();
         rootWeb.eval({ script: `vm.video = ${JSON.stringify(video)};` });
     }
-    if (/tumblr/.test(link)) analysisTumblrVideoByLink();
+    // if (/tumblr/.test(link)) analysisTumblrVideoByLink();
 
     // const video = {
     //     poster: 'http://i0.hdslb.com/bfs/archive/d00c2fc8666d03abb29eee5bdb43bedd4942e4d8.jpg',
-    //     src: 'http://download.blender.org/peach/bigbuckbunny_movies/BigBuckBunny_320x180.mp4',
-    //     ext: 'mp4',
+    //     url: 'http://download.blender.org/peach/bigbuckbunny_movies/BigBuckBunny_320x180.mp4',
+    //     type: 'mp4',
     //     play: false,
     // };
 

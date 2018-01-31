@@ -15,7 +15,7 @@ const vw = window.innerWidth - 54;
 const vm = new Vue({
     el: '#app',
     data: {
-        link: 'https://youtu.be/Xg7tcni_6-4',
+        link: '',
         vw: vw,
         vh: Math.floor(vw * 9 / 16),
         video: null,

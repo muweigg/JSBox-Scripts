@@ -6,7 +6,7 @@ async function analysisYouTubeVideoByLink () {
     id = keyword[1] || keyword[3];
     link = `https://youtu.be/${id}`;
 
-    // $ui.loading(true);
+    $ui.loading(true);
     $ui.toast(`解析地址`);
 
     return new Promise(resolve => {
@@ -26,36 +26,29 @@ async function analysisYouTubeVideoByLink () {
                     return;
                 }
 
-                let video = tempData.download.filter(v => {
+                let video = Object.assign({}, tempData.download.filter(v => {
                     v.title = tempData.info.title;
                     return v.type === 'mp4';
-                })[0];
+                })[0]);
 
                 video.poster = tempData.thumb[tempData.thumb.length - 1];
 
-                let download = tempData.download.map(v => {
+                video.download = tempData.download.map(v => {
                     v.title = tempData.info.title;
                     return v;
                 });
 
-                video.download = download;
+                if (tempData.downloadf instanceof Array) {
+                    video.downloadf = tempData.downloadf.map(v => {
+                        v.urlexec = tempData.urlexec;
+                        v.id = id;
+                        v.token = tempData.token;
+                        v.title = tempData.info.title;
+                        return v;
+                    });
+                }
 
-                // if (tempData.downloadf instanceof Array) {
-                //     video.downloadf = tempData.downloadf.map(v => {
-                //         v.urlexec = tempData.urlexec;
-                //         v.id = id;
-                //         v.token = tempData.token;
-                //         v.title = tempData.info.title;
-                //     });
-                // }
-
-                // delete tempData.download;
-                // delete tempData.downloadf;
-
-                $console.info(tempData.download);
-
-                // resolve(tempData);
-
+                resolve(video);
                 $ui.loading(false);
                 $device.taptic(0);
             }
