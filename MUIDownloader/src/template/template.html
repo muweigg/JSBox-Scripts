@@ -53,25 +53,19 @@
                         {{ video ? video.title : '' }}
                     </div>
                     <div class="download-list">
-                        <section>
+                        <section v-if="video.download">
                             <header>Video + Audio:</header>
-                            <div v-for="v in video.download">
-                                {{ v.quality !== '' ? v.quality : v.title }}
+                            <div v-for="v in video.download" @click="download(v);">
+                                {{ v.quality ? v.quality : v.title }}
                                 <span :class="classes[v.type]">{{v.type}}</span>
                             </div>
-                            <!-- <div>720p<span class="mp4">mp4</span></div>
-                            <div>360p<span class="webm">webm</span></div>
-                            <div>360p<span class="v3gp">3gp</span></div> -->
                         </section>
-                        <section>
+                        <section v-if="video.downloadf">
                             <header>High Quality: (Merge Audio online)</header>
-                            <div v-for="v in video.downloadf">
+                            <div v-for="v in video.downloadf" @click="convertVideo(v);">
                                 {{ v.quality !== '' ? v.quality : v.title }}
                                 <span :class="classes[v.type]">{{v.type}}</span>
                             </div>
-                            <!-- <div>1080p<span class="webm">webm</span></div>
-                            <div>480p<span class="webm">webm</span></div>
-                            <div>Base<span class="mp3">mp3</span></div> -->
                         </section>
                     </div>
                 </div>

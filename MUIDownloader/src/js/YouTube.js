@@ -32,9 +32,11 @@ async function analysisYouTubeVideoByLink () {
                 })[0]);
 
                 video.poster = tempData.thumb[tempData.thumb.length - 1];
+                video.play = false;
 
                 video.download = tempData.download.map(v => {
                     v.title = tempData.info.title;
+                    v.saveName = `${v.title}-${id}-${v.quality}.${v.type}`;
                     return v;
                 });
 
@@ -44,6 +46,7 @@ async function analysisYouTubeVideoByLink () {
                         v.id = id;
                         v.token = tempData.token;
                         v.title = tempData.info.title;
+                        v.saveName = `${v.title}-${id}-${v.quality}.${v.type}`;
                         return v;
                     });
                 }
@@ -54,5 +57,38 @@ async function analysisYouTubeVideoByLink () {
             }
         })
     });
+}
 
+async function convertYouTubeVideo (v) {
+    $ui.loading(true);
+    $ui.toast('请求转换服务器，等待转制', 10);
+    const params = {
+        urlexec: v.urlexec,
+        video_id: v.id,
+        video_url: link,
+        itag: v.itag,
+        action: v.quality,
+        title: v.title,
+        token: v.token,
+        email: 'muweigg@gmail.com'
+    };
+    $http.post({
+        url: params.urlexec,
+        timeout: 60,
+        form: params,
+        handler: function(resp) {
+            let data = resp.data;
+            $delay(1, () => {
+                $ui.toast(`开始下载 ${data.ext.toLocaleUpperCase()}`, 5);
+                $http.download({
+                    url: encodeURI(data.url),
+                    handler: function(resp) {
+                        $device.taptic(0);
+                        $ui.loading(false);
+                        $share.sheet([v.saveName, resp.data]);
+                    }
+                });
+            });
+        }
+    });
 }

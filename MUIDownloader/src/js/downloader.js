@@ -23,6 +23,10 @@ link = link.length > 0 ? link[0] : $context.link ? $context.link : $clipboard.li
 //     return;
 // }
 
+function convertFunc (func) {
+    return func.toString().replace(/^.*?\{|\}?$/g, '');
+}
+
 function initUI () {
 
     $ui.render({
@@ -63,16 +67,19 @@ function initUI () {
     rootWeb = $('rootWeb');
 }
 
-async function ready() {
-    $console.info('ready');
-    $console.info(link);
-    rootWeb.eval({ script: `vm.link = '${link}';` });
+initUI();
 
-    if (/youtu(\.?be)?/.test(link)) {
-        const video = await analysisYouTubeVideoByLink();
-        rootWeb.eval({ script: `vm.video = ${JSON.stringify(video)};` });
-    }
-    // if (/tumblr/.test(link)) analysisTumblrVideoByLink();
+async function ready() {
+    rootWeb.eval({ script: `vm.link = '${link}';` });
+    let video = {};
+
+    if (/youtu(\.?be)?/.test(link))
+        video = await analysisYouTubeVideoByLink();
+
+    if (/tumblr/.test(link))
+        video = await analysisTumblrVideoByLink();
+
+    rootWeb.eval({ script: `vm.video = ${JSON.stringify(video)};` });
 
     // const video = {
     //     poster: 'http://i0.hdslb.com/bfs/archive/d00c2fc8666d03abb29eee5bdb43bedd4942e4d8.jpg',
@@ -86,4 +93,13 @@ async function ready() {
     // });
 }
 
-initUI();
+function downloadVideo (data) {
+    $ui.toast(`开始下载 ${data.type.toLocaleUpperCase()}`);
+    $http.download({
+        url: data.url,
+        handler: function(resp) {
+            $device.taptic(0);
+            $share.sheet([data.saveName, resp.data]);
+        }
+    });
+}

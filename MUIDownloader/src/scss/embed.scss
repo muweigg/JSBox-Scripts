@@ -95,7 +95,7 @@ body {
                         margin: 0 auto;
                         background-color: $bgc;
                         border-radius: 5pt;
-                        opacity: .3;
+                        opacity: .5;
                         transition: opacity .3s linear;
 
                         &.playing {
@@ -140,11 +140,14 @@ body {
                                 line-height: 30pt;
                                 text-align: center;
                                 position: relative;
-                                text-transform: uppercase;
                                 background-color: $bgc;
                                 margin-top: 1px;
                                 font-size: $fontSize - 1pt;
                                 transition: all .2s ease-in-out;
+                                padding: 0 50pt;
+                                white-space: nowrap;
+                                text-overflow: ellipsis;
+                                overflow: hidden;
 
                                 &:active {
                                     background-color: rgba(117, 117, 117, .5);
@@ -162,6 +165,7 @@ body {
                                     right: 10pt;
                                     transform: translateY(-50%);
                                     font-size: $fontSize - 4pt;
+                                    text-transform: uppercase;
 
                                     &.mp3 {
                                         // background-color: #FF8F00;

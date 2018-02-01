@@ -57,16 +57,14 @@ window.onload = () => {
             video (val) {
                 if (val) initVideoEvents();
             }
+        },
+        methods: {
+            download (v) {
+                $notify('exec', {func: 'downloadVideo', params: v});
+            },
+            convertVideo (v) {
+                $notify('exec', {func: 'convertYouTubeVideo', params: v});
+            }
         }
     });
 }
-
-// setTimeout(() => {
-//     vm.video = {
-//         poster: 'http://i0.hdslb.com/bfs/archive/d00c2fc8666d03abb29eee5bdb43bedd4942e4d8.jpg',
-//         url: 'http://download.blender.org/peach/bigbuckbunny_movies/BigBuckBunny_320x180.mp4',
-//         type: 'mp4',
-//         play: false
-//     };
-// }, 2000);
-// $notify('debug', 'is ok');
