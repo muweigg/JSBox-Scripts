@@ -10,35 +10,22 @@ const base64Icons = {
     'twitter': Twitter,
 };
 
-const vw = window.innerWidth - 54;
+let vm = null;
 
-const vm = new Vue({
-    el: '#app',
-    data: {
-        link: '',
-        vw: vw,
-        vh: Math.floor(vw * 9 / 16),
-        video: null,
-    },
-    mounted: function() {
-        this.$nextTick(function(){
-            initCanvas();
-            $notify('exec', { func: 'ready' });
-        });
-    },
-    watch: {
-        video (val) {
-            if (val) initVideoEvents();
-        }
-    }
-});
+const vw = window.innerWidth - 54,
+    classes = {
+        'mp3': 'mp3',
+        'mp4': 'mp4',
+        'webm': 'webm',
+        '3gp': 'v3gp',
+    };
 
 function initCanvas () {
     let glpi = new GLParticleIcons('c', [
         base64Icons['youtube'],
         base64Icons['tumblr'],
         base64Icons['twitter'],
-    ]);
+    ], 50);
 
     window.addEventListener("touchstart", function (event) { glpi.change(); });
 }
@@ -47,6 +34,30 @@ function initVideoEvents () {
     Vue.nextTick(function(){
         vm.$refs.v.addEventListener('play', () => { vm.video.play = true; }, false);
         vm.$refs.v.addEventListener('pause', () => { vm.video.play = false; }, false);
+    });
+}
+
+window.onload = () => {
+    vm = new Vue({
+        el: '#app',
+        data: {
+            link: '',
+            vw: vw,
+            vh: Math.floor(vw * 9 / 16),
+            classes: classes,
+            video: null,
+        },
+        mounted: function() {
+            this.$nextTick(function(){
+                initCanvas();
+                $notify('exec', { func: 'ready' });
+            });
+        },
+        watch: {
+            video (val) {
+                if (val) initVideoEvents();
+            }
+        }
     });
 }
 

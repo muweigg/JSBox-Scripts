@@ -1,6 +1,6 @@
 class GLParticleIcons {
 
-    constructor(canvasId, imageURLArr) {
+    constructor(canvasId, imageURLArr, fieldOfView = 30) {
         this.canvas = document.createElement('canvas');
         this.ctx = this.canvas.getContext('2d');
         this.imageURLArr = imageURLArr;
@@ -15,6 +15,7 @@ class GLParticleIcons {
         this.perspectiveMatrix = null;
         this.randomTargetXArr = [];
         this.randomTargetYArr = [];
+        this.fieldOfView = fieldOfView;
 
         this.coefficient = .4;
         this.targetCoefficient = .01;
@@ -28,10 +29,8 @@ class GLParticleIcons {
 
     onLoadImageHandler(image, canvas, ctx, number) {
         const size = image.width;
-        // this.canvas.width = size;
-        // this.canvas.height = size;
-        this.canvas.width = 32;
-        this.canvas.height = 32;
+        this.canvas.width = size;
+        this.canvas.height = size;
 
         this.ctx.drawImage(image, 0, 0);
         const imageData = this.ctx.getImageData(0, 0, size, size);
@@ -122,7 +121,8 @@ class GLParticleIcons {
         this.gl.bufferData(this.gl.ARRAY_BUFFER, this.vertices, this.gl.DYNAMIC_DRAW);
 
         this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
-        let fieldOfView = 30.0;
+        // let fieldOfView = 30.0;
+        let fieldOfView = this.fieldOfView;
         let aspectRatio = this.canvas.width / this.canvas.height;
         let nearPlane = 1.0;
         let farPlane = 10000.0;

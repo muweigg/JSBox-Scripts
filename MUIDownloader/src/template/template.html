@@ -36,10 +36,10 @@
     <div id="app">
         <div class="link">{{ link }}</div>
         <main>
-            <div class="video-download expand">
-                <div class="video-download-wrap">
+            <div class="video-download" :class="{expand: !!video}">
+                <div class="video-download-wrap" v-if="video">
                     <transition name="fade">
-                        <template v-if="video">
+                        <template>
                             <video controls
                                 ref="v"
                                 :poster="video.poster"
@@ -55,19 +55,27 @@
                     <div class="download-list">
                         <section>
                             <header>Video + Audio:</header>
-                            <div>720p<span class="mp4">mp4</span></div>
+                            <div v-for="v in video.download">
+                                {{ v.quality !== '' ? v.quality : v.title }}
+                                <span :class="classes[v.type]">{{v.type}}</span>
+                            </div>
+                            <!-- <div>720p<span class="mp4">mp4</span></div>
                             <div>360p<span class="webm">webm</span></div>
-                            <div>360p<span class="v3gp">3gp</span></div>
+                            <div>360p<span class="v3gp">3gp</span></div> -->
                         </section>
                         <section>
                             <header>High Quality: (Merge Audio online)</header>
-                            <div>1080p<span class="webm">webm</span></div>
+                            <div v-for="v in video.downloadf">
+                                {{ v.quality !== '' ? v.quality : v.title }}
+                                <span :class="classes[v.type]">{{v.type}}</span>
+                            </div>
+                            <!-- <div>1080p<span class="webm">webm</span></div>
                             <div>480p<span class="webm">webm</span></div>
-                            <div>Base<span class="mp3">mp3</span></div>
+                            <div>Base<span class="mp3">mp3</span></div> -->
                         </section>
                     </div>
-                    <span class="parsing">Parsing...</span>
                 </div>
+                <span class="parsing" v-if="!video">Parsing...</span>
             </div>
         </main>
     </div>
