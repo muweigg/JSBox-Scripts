@@ -12,8 +12,7 @@ const base64Icons = {
 
 let vm = null;
 
-const vw = window.innerWidth - 54,
-    classes = {
+const classes = {
         'mp3': 'mp3',
         'mp4': 'mp4',
         'webm': 'webm',
@@ -38,6 +37,8 @@ function initVideoEvents () {
 }
 
 window.onload = () => {
+    const vw = window.innerWidth - 54;
+    
     vm = new Vue({
         el: '#app',
         data: {
