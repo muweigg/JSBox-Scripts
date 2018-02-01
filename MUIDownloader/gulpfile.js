@@ -63,7 +63,7 @@ gulp.task('build',
             './src/js/downloader.js',
             './src/js/*.js',
         ])
-        .pipe(concat('downloader.js'))
+        .pipe(concat('MUIDownloader.js'))
         .pipe(inject(gulp.src(['./tmp/template.html']), {
             starttag: '<!-- inject:template -->',
             transform: function (filePath, file) {
@@ -71,6 +71,9 @@ gulp.task('build',
             }
         }))
         .pipe(babel({
+            parserOpts: {
+                allowReturnOutsideFunction: true, 
+            },
             presets: ['minify']
         }))
         // .pipe(uglify())

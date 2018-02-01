@@ -13,15 +13,15 @@ link = $detector.link($context.text).map(link => {
 
 link = link.length > 0 ? link[0] : $context.link ? $context.link : $clipboard.link;
 
-// if (!link) return;
+if (!link) return;
 
-// if (!/youtu(\.?be)?|tumblr/.test(link)) {
-//     $ui.alert({
-//         title: "暂不支持",
-//         message: "目前只支持：YouTube & Tumblr",
-//     });
-//     return;
-// }
+if (!/youtu(\.?be)?|tumblr/.test(link)) {
+    $ui.alert({
+        title: "暂不支持",
+        message: "目前只支持：YouTube & Tumblr",
+    });
+    return;
+}
 
 function convertFunc (func) {
     return func.toString().replace(/^.*?\{|\}?$/g, '');
