@@ -7,7 +7,7 @@
 let version = '1.1.3', link = '', keyword = '', rootView = '', rootWeb = '';
 
 link = $detector.link($context.text).map(link => {
-    if (/youtu(\.?be)?|tumblr/.test(link))
+    if (/youtu(\.?be)?|tumblr|twitter/.test(link))
         return link;
 });
 
@@ -15,7 +15,7 @@ link = link.length > 0 ? link[0] : $context.link ? $context.link : $clipboard.li
 
 if (!link) return;
 
-if (!/youtu(\.?be)?|tumblr/.test(link)) {
+if (!/youtu(\.?be)?|tumblr|twitter/.test(link)) {
     $ui.alert({
         title: "暂不支持",
         message: "目前只支持：YouTube & Tumblr",
@@ -78,6 +78,11 @@ async function ready() {
 
     if (/tumblr/.test(link))
         video = await analysisTumblrVideoByLink();
+
+    if (/twitter/.test(link)) {
+        analysisTwitterVideoByLink();
+        // video = await analysisTwitterVideoByLink();
+    }
 
     rootWeb.eval({ script: `vm.video = ${JSON.stringify(video)};` });
 

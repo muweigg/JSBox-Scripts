@@ -56,14 +56,14 @@
                         <section v-if="video.download">
                             <header>Video + Audio:</header>
                             <div v-for="v in video.download" @click="download(v);">
-                                {{ v.quality ? v.quality : v.title }}
+                                {{ v.quality && v.quality !== '' ? v.quality : v.title }}
                                 <span :class="classes[v.type]">{{v.type}}</span>
                             </div>
                         </section>
                         <section v-if="video.downloadf">
                             <header>High Quality: (Merge Audio online)</header>
                             <div v-for="v in video.downloadf" @click="convertVideo(v);">
-                                {{ v.quality !== '' ? v.quality : v.title }}
+                                {{ v.quality && v.quality !== '' ? v.quality : v.title }}
                                 <span :class="classes[v.type]">{{v.type}}</span>
                             </div>
                         </section>

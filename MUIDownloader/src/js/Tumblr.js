@@ -17,17 +17,12 @@ function analysisTumblrVideoByLink () {
             let a = atags[i];
             if (/tumblr.*?video_file/.test(a.href)) {
                 const url = a.href;
-                const str = url.match(/.*\/(.*?\/.*?)$/)[1].split('/');
-                const title = str[0]
-                let quality = null;
-
-                if (str.length > 1) quality = str[1];
+                const title = url.match(/.*\/(.*?)$/)[1];
                 
                 data.download.push({
                     title: title,
                     url: url,
                     type: 'mp4',
-                    quality: quality,
                     saveName: title + '.mp4'
                 });
             }
