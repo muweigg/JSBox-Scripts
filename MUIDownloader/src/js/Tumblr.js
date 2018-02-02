@@ -43,7 +43,6 @@ function analysisTumblrVideoByLink () {
     }
 
     return new Promise(resolve => {
-
         rootView.add({
             type: "web",
             props: {

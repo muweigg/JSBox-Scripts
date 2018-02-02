@@ -13,14 +13,15 @@ const base64Icons = {
 let vm = null;
 
 const classes = {
-        'mp3': 'mp3',
-        'mp4': 'mp4',
-        'webm': 'webm',
-        '3gp': 'v3gp',
-    };
+    'mp3': 'mp3',
+    'mp4': 'mp4',
+    'webm': 'webm',
+    '3gp': 'v3gp',
+};
 
 function initCanvas () {
     let imgs = [];
+    
     imgs.push(base64Icons[vm.platform]);
     delete base64Icons[vm.platform];
 
@@ -53,7 +54,6 @@ window.onload = () => {
         },
         mounted: function() {
             this.$nextTick(function(){
-                // initCanvas();
                 $notify('exec', { func: 'ready' });
             });
         },
