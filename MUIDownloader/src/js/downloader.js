@@ -25,7 +25,7 @@ if (!/youtu(\.?be)?|tumblr|twitter/.test(link)) {
 
 function convertFunc (func) {
     // ^.*?{
-    return func.toString().replace(/^.*?\{|\}$/g, ';');
+    return func.toString().replace(/^.*?\{|\}$/g, '');
 }
 
 function initUI () {
