@@ -20,11 +20,13 @@ const classes = {
     };
 
 function initCanvas () {
-    let glpi = new GLParticleIcons('c', [
-        base64Icons['youtube'],
-        base64Icons['tumblr'],
-        base64Icons['twitter'],
-    ], 50);
+    let imgs = [];
+    imgs.push(base64Icons[vm.platform]);
+    delete base64Icons[vm.platform];
+
+    for (let o in base64Icons) { imgs.push(base64Icons[o]); }
+
+    let glpi = new GLParticleIcons('c', imgs, 50);
 
     window.addEventListener("touchstart", function (event) { glpi.change(); });
 }
@@ -43,6 +45,7 @@ window.onload = () => {
         el: '#app',
         data: {
             link: '',
+            platform: '',
             vw: vw,
             vh: Math.floor(vw * 9 / 16),
             classes: classes,
@@ -50,13 +53,16 @@ window.onload = () => {
         },
         mounted: function() {
             this.$nextTick(function(){
-                initCanvas();
+                // initCanvas();
                 $notify('exec', { func: 'ready' });
             });
         },
         watch: {
             video (val) {
                 if (val) initVideoEvents();
+            },
+            platform (val) {
+                if (val !== '') initCanvas();
             }
         },
         methods: {

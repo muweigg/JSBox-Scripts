@@ -1,10 +1,10 @@
 /**
  * MUI Downloader
  * @author MUI <muweigg@gmail.com>
- * @description YouTube & Tumblr 视频下载器
+ * @description YouTube & Tumblr & Twitter 视频下载器
  */
 
-let version = '1.1.3', link = '', keyword = '', rootView = '', rootWeb = '';
+let version = '2.0.0', link = '', keyword = '', rootView = '', rootWeb = '', platform = '';
 
 link = $detector.link($context.text).map(link => {
     if (/youtu(\.?be)?|tumblr|twitter/.test(link))
@@ -15,16 +15,18 @@ link = link.length > 0 ? link[0] : $context.link ? $context.link : $clipboard.li
 
 if (!link) return;
 
-if (!/youtu(\.?be)?|tumblr|twitter/.test(link)) {
-    $ui.alert({
-        title: "暂不支持",
-        message: "目前只支持：YouTube & Tumblr",
-    });
-    return;
+function checkSupport() {
+    const regex = new RegExp('https?:\/\/.*?(youtu(\.?be)?|tumblr|twitter).*?\/', 'i');
+    let support = false;
+
+    if (regex.test(link)) support = true;
+
+    if (support) platform = link.match(regex)[1].replace('.', '').toLocaleLowerCase();
+
+    return support;
 }
 
 function convertFunc (func) {
-    // ^.*?{
     return func.toString().replace(/^.*?\{|\}$/g, '');
 }
 
@@ -50,8 +52,6 @@ function initUI () {
                 layout: $layout.fill,
                 events: {
                     exec (data) {
-                        $console.info("exec");
-                        $console.info(JSON.stringify(data, null, 2));
                         const func = eval(`${data.func}`);
                         if (data.params) func(data.params);
                         else func();
@@ -68,37 +68,6 @@ function initUI () {
     rootWeb = $('rootWeb');
 }
 
-initUI();
-
-async function ready() {
-    rootWeb.eval({ script: `vm.link = '${link}';` });
-    let video = {};
-
-    if (/youtu(\.?be)?/.test(link))
-        video = await analysisYouTubeVideoByLink();
-
-    if (/tumblr/.test(link))
-        video = await analysisTumblrVideoByLink();
-
-    if (/twitter/.test(link)) {
-        analysisTwitterVideoByLink();
-        // video = await analysisTwitterVideoByLink();
-    }
-
-    rootWeb.eval({ script: `vm.video = ${JSON.stringify(video)};` });
-
-    // const video = {
-    //     poster: 'http://i0.hdslb.com/bfs/archive/d00c2fc8666d03abb29eee5bdb43bedd4942e4d8.jpg',
-    //     url: 'http://download.blender.org/peach/bigbuckbunny_movies/BigBuckBunny_320x180.mp4',
-    //     type: 'mp4',
-    //     play: false,
-    // };
-
-    // $delay(2, function() {
-    //     rootWeb.eval({ script: `vm.video = ${JSON.stringify(video)};` });
-    // });
-}
-
 function downloadVideo (data) {
     $ui.toast(`开始下载 ${data.type.toLocaleUpperCase()}`);
     $http.download({
@@ -109,3 +78,29 @@ function downloadVideo (data) {
         }
     });
 }
+
+async function ready() {
+
+    rootWeb.eval({ script: `vm.link = '${link}'; vm.platform = '${platform}';` });
+
+    const analysis = {
+        youtube: analysisYouTubeVideoByLink,
+        tumblr: analysisTumblrVideoByLink,
+        twitter: analysisTwitterVideoByLink,
+    };
+
+    let video = await analysis[platform]();
+
+    rootWeb.eval({ script: `vm.video = ${JSON.stringify(video)};` });
+    
+}
+
+if (!checkSupport()) {
+    $ui.alert({
+        title: "暂不支持",
+        message: "目前只支持：YouTube & Tumblr & Twitter",
+    });
+    return;
+}
+
+initUI();
