@@ -1,76 +1,75 @@
-async function getTwitterVideodownloaderToken () {
-    
-    return new Promise(resolve => {
-        $http.get({
-            url: 'http://twittervideodownloader.com/',
-            handler: function(resp) {
-                const data = resp.data;
-                const token = data.match(/csrfmiddlewaretoken.*value='(.*?)'/)[1].replace(/"|'/g, '');
-                resolve(token);
-            }
-        })
-    });
-}
 
 async function analysisTwitterVideoByLink () {
-    const HOST = 'http://twittervideodownloader.com/download';
-    const token = await getTwitterVideodownloaderToken();
 
     $ui.loading(true);
     $ui.toast(`解析地址`);
 
+    function parseHTML () {
+        function mui () {
+            $.post('/get/', {
+                url: '{{link}}'
+            }).then(data => $notify('processData', data));
+        }
+        mui();
+    }
+
     return new Promise(resolve => {
-        $http.post({
-            url: HOST,
-            form: {
-                csrfmiddlewaretoken: token,
-                tweet: link
+        rootView.add({
+            type: "web",
+            props: {
+                id: 'twitter_web',
+                url: `http://savevideo.me`,
             },
-            handler: function(resp) {
-                const data = resp.data;
-                const poster = data.match(/<center>[\s\S]*?<img.*?src="(.*?)".*?\/>/)[1];
-                const r = /columns">\s*<a.*?href="(.*?)".*?>.*?<\/a>[\s\S]*?<p.*?>(.*?)<\/p>/g;
+            layout (make) {
+                make.size.equalTo($size(0, 0));
+            },
+            events: {
+                didFinish (sender) {
+                    $ui.loading(false);
+                    $ui.toast('解析完成');
+                    sender.eval({ script: convertFunc(parseHTML).replace('{{link}}', link) });
+                },
+                processData (data) {
+                    let download = [], poster = '', title, v;
+                    const r = /href="(https?.*?)"/ig;
 
-                let title = data.match(/<center>[\s\S]*?<p.*?>[\s\S]*?<\/p>[\s\S]*?<b>(.*?)<\/b>/)[1];
-                if (/<i>/.test(title))
-                    title = data.match(/<center>[\s\S]*?<p.*?>[\s\S]*?<\/p>[\s\S]*?<a.*?\/a>[\s\S]*<b>(.*?)<\/b>/)[1];
-
-                let download = [];
-                v = r.exec(data);
-
-                while (v) {
-                    let tmp = v[2].replace(/\s*/g, '').split(':');
-                    download.push({
-                        title: title,
-                        url: v[1],
-                        quality: tmp[0],
-                        type: tmp[1] ? tmp[1] : tmp[0],
-                        saveName: `${encodeURIComponent(title)}.${tmp[1] ? tmp[1] : tmp[0]}`
-                    });
+                    poster = data.match(/thumbnails.*?<img.*?src="(.*?)"/)[1];
+                    title = data.match(/title="(.*?)"/)[1];
+                    
                     v = r.exec(data);
+                    while (v) {
+                        const type = v[1].substr(v[1].lastIndexOf('.') + 1);
+                        let quality = v[1].match(/\/(\d+x\d+)\//);
+                        let tmp = {
+                            title: title,
+                            url: v[1],
+                            quality: '',
+                            type: type,
+                            saveName: `${title}.${type}`
+                        };
+
+                        if (quality && quality.length > 1)
+                            tmp.quality = quality[1];
+                        
+                        download.push(tmp);
+
+                        v = r.exec(data);
+                    }
+
+                    let video = {
+                        poster: poster,
+                        title: title,
+                        url: download[0].url,
+                        type: download[0].type,
+                        play: false,
+                        download: download
+                    };
+
+                    resolve(video);
+                    $device.taptic(0);
+                    $('twitter_web').remove();
                 }
-
-                download = download.sort((a, b) => {
-                    let l = parseInt(a.quality.replace('x', '')),
-                        r = parseInt(b.quality.replace('x', ''));
-                    if (l > r) return 1
-                    else if (l < r) return -1
-                    else if (l == r) return 0;
-                }).reverse();
-
-                const video = {
-                    poster: poster,
-                    title: title,
-                    url: download[0].url,
-                    type: download[0].type,
-                    play: false,
-                    download: download
-                }
-
-                resolve(video);
-                $ui.loading(false);
-                $device.taptic(0);
             }
-        })
+        });
     });
 }

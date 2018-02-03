@@ -44,7 +44,10 @@
                                 ref="v"
                                 :poster="video.poster"
                                 :class="{ playing: video.play }"
-                                :style="{ width: vw + 'px', height: vh + 'px' }">
+                                :style="{ width: vw + 'px', height: vh + 'px' }"
+                                @touchstart="video.play = true;"
+                                @touchend="video.play = false;"
+                                >
                                 <source :src="video.url" :type="'video/' + video.type">
                             </video>
                         </template>
