@@ -77,7 +77,7 @@ gulp.task('build',
             presets: ['minify']
         }))
         // .pipe(uglify())
-        .pipe(gulp.dest('./dist'))
+        .pipe(gulp.dest('./'))
 );
 
 gulp.task('watch:embed:vendors',

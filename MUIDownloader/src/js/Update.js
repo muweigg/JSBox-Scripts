@@ -26,8 +26,6 @@ async function checkUpdate () {
     }
 
     const newVersion = await getVersion();
-    $console.info(version)
-    $console.info(newVersion)
     if (version === newVersion) return;
     const msg = await getUpdateMessage();
 
