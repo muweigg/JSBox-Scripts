@@ -1,6 +1,6 @@
 async function checkUpdate () {
     const checkVersionURL = 'https://raw.githubusercontent.com/muweigg/JSBox-Scripts/master/MUIDownloader/README.md',
-        messageURL = 'https://raw.githubusercontent.com/muweigg/JSBox-Scripts/master/MUIDownloader/UPDATE',
+        messageURL = 'https://raw.githubusercontent.com/muweigg/JSBox-Scripts/master/MUIDownloader/UPDATE.md',
         updateURL = 'jsbox://install?url=https://raw.githubusercontent.com/muweigg/JSBox-Scripts/master/MUIDownloader/MUIDownloader.js&icon=icon_035.png&name=MUIDownloader';
     
     async function getVersion () {
@@ -29,9 +29,6 @@ async function checkUpdate () {
     if (version === newVersion) return;
     const msg = await getUpdateMessage();
 
-    $console.info(JSON.stringify(message, null, 2));
-    
-    $device.taptic(0);
     $ui.alert({
         title: `发现新版本: ${newVersion}`,
         message: msg.message,
@@ -44,7 +41,9 @@ async function checkUpdate () {
                 $app.openURL(encodeURI(`${updateURL}`));
             }
         }]
-    })
+    });
+    
+    $device.taptic(0);
 }
 
 checkUpdate();
