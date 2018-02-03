@@ -17,7 +17,7 @@ async function checkUpdate () {
     async function getUpdateMessage () {
         return new Promise(resolve => {
             $http.get({
-                url: checkVersionURL,
+                url: messageURL,
                 handler (resp) {
                     resolve(resp.data);
                 }
@@ -42,7 +42,7 @@ async function checkUpdate () {
             }
         }]
     });
-    
+
     $device.taptic(0);
 }
 
