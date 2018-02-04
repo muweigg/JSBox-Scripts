@@ -1,48 +1,49 @@
 async function analysisFacebookVideoByLink () {
-    const HOST = 'https://www.online-downloader.com/DL/dd.php';
 
     $ui.loading(true);
     $ui.toast(`解析地址`);
 
     return new Promise(resolve => {
         $http.get({
-            url: `${HOST}?videourl=${encodeURI(link)}`,
+            url: link,
             handler: function(resp) {
-                const data = eval(resp.data);
+                try {
+                    const data = resp.data;
+                    const title = data.match(/<title.*?>([\s\S]*?)<\/title>/)[1];
+                    const poster = data.match(/<code.*?<img.*?src="(.*?)".*?>/)[1];
+                    const sd = data.match(/sd_src:"(.*?)"/)[1];
+                    const hd = data.match(/hd_src:"(.*?)"/)[1];
 
-                const video = {
-                        title: data.Video_Title,
-                        poster: data.Video_Image,
-                        url: data.Video_DownloadURL,
+                    const video = {
+                        title: title,
+                        poster: poster,
+                        url: hd,
                         type: 'mp4',
-                        play: false
+                        play: false,
+                        download: [{
+                            title: title,
+                            url: hd,
+                            type: 'mp4',
+                            quality: 'HD',
+                            saveName: title + 'hd.mp4'
+                        }, {
+                            title: title,
+                            url: sd,
+                            type: 'mp4',
+                            quality: 'SD',
+                            saveName: title + 'sd.mp4'
+                        }]
                     };
-                
-                if (data.Video_Format_Count > 0) {
-                    video.download = [];
-
-                    for (let i = 1; i <= data.Video_Format_Count; i++) {
-                        const WH = data[`Video_${i}_WH`];
-                        const Format_ID = data[`Video_${i}_Format_ID`];
-                        const Url = data[`Video_${i}_Url`];
-                        const Ext = data[`Video_${i}_Ext`];
-                        const Acodec = data[`Video_${i}_Acodec`];
-
-                        if (/\.m3u8$/.test(Url) || WH === 'audio' || Acodec === 'none') continue;
-
-                        video.download.push({
-                            title: data.Video_Title,
-                            url: Url,
-                            quality: Format_ID.replace('_', ' ').toLocaleUpperCase(),
-                            type: Ext,
-                            saveName: `${data.Video_Title}-${Format_ID}.${Ext}`
-                        });
-                    }
+                    
+                    resolve(video);
+                    $ui.loading(false);
+                    $device.taptic(0);
+                } catch (e) {
+                    $ui.alert({
+                        title: "解析失败",
+                        message: "无法获取视频信息",
+                    });
                 }
-
-                resolve(video);
-                $ui.loading(false);
-                $device.taptic(0);
             }
         })
     });
