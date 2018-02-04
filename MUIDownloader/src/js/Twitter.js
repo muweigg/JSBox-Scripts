@@ -30,44 +30,57 @@ async function analysisTwitterVideoByLink () {
                     sender.eval({ script: convertFunc(parseHTML).replace('{{link}}', link) });
                 },
                 processData (data) {
-                    let download = [], poster = '', title, v;
-                    const r = /href="(https?.*?)"/ig;
-
-                    poster = data.match(/thumbnails.*?<img.*?src="(.*?)"/)[1];
-                    title = data.match(/title="(.*?)"/)[1];
-                    
-                    v = r.exec(data);
-                    while (v) {
-                        const type = v[1].substr(v[1].lastIndexOf('.') + 1);
-                        let quality = v[1].match(/\/(\d+x\d+)\//);
-                        let tmp = {
-                            title: title,
-                            url: v[1],
-                            quality: '',
-                            type: type,
-                            saveName: `${title}.${type}`
-                        };
-
-                        if (quality && quality.length > 1)
-                            tmp.quality = quality[1];
+                    try {
+                        let download = [], poster = '', title, v;
+                        const r = /href="(https?.*?)"/ig;
+    
+                        poster = data.match(/thumbnails.*?<img.*?src="(.*?)"/)[1];
+                        title = data.match(/title="(.*?)"/)[1];
                         
-                        download.push(tmp);
-
                         v = r.exec(data);
+                        while (v) {
+                            const type = v[1].substr(v[1].lastIndexOf('.') + 1);
+                            let quality = v[1].match(/\/(\d+x\d+)\//);
+    
+                            if (/^com/i.test(type)) {
+                                v = r.exec(data);
+                                continue;
+                            }
+                            
+                            let tmp = {
+                                title: title,
+                                url: v[1],
+                                quality: '',
+                                type: type,
+                                saveName: `${title}.${type}`
+                            };
+    
+                            if (quality && quality.length > 1)
+                                tmp.quality = quality[1];
+                            
+                            download.push(tmp);
+    
+                            v = r.exec(data);
+                        }
+    
+                        let video = {
+                            poster: poster,
+                            title: title,
+                            url: download[0].url,
+                            type: download[0].type,
+                            play: false,
+                            download: download
+                        };
+    
+                        resolve(video);
+                        $device.taptic(0);
+                        $('twitter_web').remove();
+                    } catch (e) {
+                        $ui.alert({
+                            title: "解析失败",
+                            message: "无法获取视频信息",
+                        });
                     }
-
-                    let video = {
-                        poster: poster,
-                        title: title,
-                        url: download[0].url,
-                        type: download[0].type,
-                        play: false,
-                        download: download
-                    };
-
-                    resolve(video);
-                    $device.taptic(0);
-                    $('twitter_web').remove();
                 }
             }
         });

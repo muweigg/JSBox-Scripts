@@ -10,9 +10,6 @@ async function analysisFacebookVideoByLink () {
             handler: function(resp) {
                 const data = eval(resp.data);
 
-                if (data.Video_DownloadURL && data.Video_Title && data.Video_FileName)
-                    $ui.toast(`无法解析视频`);
-
                 const video = {
                         title: data.Video_Title,
                         poster: data.Video_Image,
