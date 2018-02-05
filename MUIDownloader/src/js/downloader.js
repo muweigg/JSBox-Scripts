@@ -34,7 +34,7 @@ function initUI () {
 
     $ui.render({
         props: {
-            title: "MUI Downloader"
+            title: `MUI Downloader ${version}`
         },
         views: [
             {
