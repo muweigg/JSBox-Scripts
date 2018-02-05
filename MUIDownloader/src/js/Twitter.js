@@ -25,8 +25,6 @@ async function analysisTwitterVideoByLink () {
             },
             events: {
                 didFinish (sender) {
-                    $ui.loading(false);
-                    $ui.toast('解析完成');
                     sender.eval({ script: convertFunc(parseHTML).replace('{{link}}', link) });
                 },
                 processData (data) {
@@ -74,6 +72,8 @@ async function analysisTwitterVideoByLink () {
     
                         resolve(video);
                         $device.taptic(0);
+                        $ui.loading(false);
+                        $ui.toast('解析完成');
                         $('twitter_web').remove();
                     } catch (e) {
                         $ui.alert({
