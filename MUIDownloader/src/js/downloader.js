@@ -7,7 +7,7 @@
 let version = '2.0.1', link = '', keyword = '', rootView = '', rootWeb = '', platform = '';
 
 link = $detector.link($context.text).map(link => {
-    if (/youtu(\.?be)?|tumblr|twitter|facebook/.test(link))
+    if (/youtu(\.?be)?|tumblr|twitter|facebook|vimeo/i.test(link))
         return link;
 });
 
@@ -16,7 +16,7 @@ link = link.length > 0 ? link[0] : $context.link ? $context.link : $clipboard.li
 if (!link) return;
 
 function checkSupport() {
-    const regex = new RegExp('https?:\/\/.*?(youtu(\.?be)?|tumblr|twitter|facebook).*?\/', 'i');
+    const regex = new RegExp('https?:\/\/.*?(youtu(\.?be)?|tumblr|twitter|facebook|vimeo).*?\/', 'i');
     let support = false;
 
     if (regex.test(link)) support = true;
@@ -87,7 +87,8 @@ async function ready() {
         youtube: analysisYouTubeVideoByLink,
         tumblr: analysisTumblrVideoByLink,
         twitter: analysisTwitterVideoByLink,
-        facebook: analysisFacebookVideoByLink
+        facebook: analysisFacebookVideoByLink,
+        vimeo: analysisVimeoVideoByLink,
     };
 
     let video = await analysis[platform]();
@@ -99,7 +100,7 @@ async function ready() {
 if (!checkSupport()) {
     $ui.alert({
         title: "暂不支持",
-        message: "目前只支持：YouTube & Tumblr & Twitter & Facebook",
+        message: "目前只支持：YouTube & Tumblr & Twitter & Facebook & Vimeo",
     });
     return;
 }

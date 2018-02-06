@@ -1,4 +1,4 @@
 {
-    "message": "Support:\nYouTube & Tumblr & Twitter & Facebook",
-    "version": "2.0.1"
+    "message": "Support:\nYouTube & Tumblr & Twitter & Facebook & Vimeo",
+    "version": "2.1.2"
 }
