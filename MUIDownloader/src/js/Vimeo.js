@@ -17,6 +17,7 @@ async function analysisVimeoVideoByLink () {
                         v.url = v.id;
                         v.quality = label[0].replace(' ', '');
                         v.type = label[1].replace(' ', '');
+                        v.saveName = v.title + v.type;
                         return v;
                     });
 
