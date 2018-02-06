@@ -4,7 +4,7 @@
  * @description YouTube & Tumblr & Twitter & Facebook 视频下载器
  */
 
-let version = '2.4.4', link = '', keyword = '', rootView = '', rootWeb = '', platform = '';
+let version = '2.4.5', link = '', keyword = '', rootView = '', rootWeb = '', platform = '';
 
 link = $detector.link($context.text).map(link => {
     if (/youtu(\.?be)?|tumblr|twitter|facebook|vimeo|vine|aol|dailymotion/i.test(link))
@@ -28,12 +28,6 @@ function checkSupport() {
     if (regex.test(link)) support = true;
 
     if (support) platform = link.match(regex)[1].replace('.', '').toLocaleLowerCase();
-
-    if (platform === 'youtube') {
-        let keyword = link.match(/.*\/.*v=(.*?)(&feature=.*?)?$|.*\/(.*?)(&feature=.*?)?$/);
-        keyword = keyword[1] || keyword[3];
-        link = `https://youtu.be/${keyword}`;
-    }
 
     return support;
 }

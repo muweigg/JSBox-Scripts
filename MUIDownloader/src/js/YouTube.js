@@ -1,6 +1,6 @@
 async function analysisYouTubeVideoByLink () {
     const parseHost = 'http://youtube1080.megavn.net';
-    let id = '', data = {};
+    let id = '';
 
     let keyword = link.match(/.*\/.*v=(.*?)(&feature=.*?)?$|.*\/(.*?)(&feature=.*?)?$/);
     id = keyword[1] || keyword[3];
@@ -9,14 +9,27 @@ async function analysisYouTubeVideoByLink () {
     $ui.loading(true);
     $ui.toast(`解析地址`);
 
+    async function getThumb (thumb) {
+        return new Promise(resolve => {
+            $http.get({
+                url: thumb,
+                handler: function(resp) {
+                    const response = resp.response;
+                    resolve(response.statusCode);
+                }
+            })
+        });
+    }
+
     return new Promise(resolve => {
         $http.post({
             url: `${parseHost}/ajax.php`,
             form: { curID: id, url: link },
             timeout: 30,
-            handler (resp) {
+            handler: async (resp) => {
                 try {
                     let tempData = Object.assign({}, resp.data);
+                    tempData.thumb = tempData.thumb.reverse();
 
                     if (!tempData.download && !tempData.downloadf) {
                         $ui.alert({
@@ -32,7 +45,14 @@ async function analysisYouTubeVideoByLink () {
                         return v.type === 'mp4';
                     })[0]);
 
-                    video.poster = tempData.thumb[tempData.thumb.length - 1];
+                    for (let i = 0; i < tempData.thumb.length; i++) {
+                        let thumb = tempData.thumb[i];
+                        let statusCode = await getThumb(thumb);
+                        if (statusCode === 404) continue;
+                        video.poster = thumb;
+                        break;
+                    }
+
                     video.playing = false;
 
                     video.download = tempData.download.map(v => {
@@ -53,8 +73,9 @@ async function analysisYouTubeVideoByLink () {
                     }
 
                     resolve(video);
-                    $ui.loading(false);
                     $device.taptic(0);
+                    $ui.loading(false);
+                    $ui.toast('解析完成');
                 } catch (e) {
                     $device.taptic(0);
                     $ui.loading(false);
