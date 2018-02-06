@@ -13,7 +13,13 @@ link = $detector.link($context.text).map(link => {
 
 link = link.length > 0 ? link[0] : $context.link ? $context.link : $clipboard.link;
 
-if (!link) return;
+if (!link) {
+    $ui.alert({
+        title: '提示',
+        message: '剪切板未获取到任何链接',
+    });
+    return;
+}
 
 function checkSupport() {
     const regex = new RegExp('https?:\/\/.*?(youtu(\.?be)?|tumblr|twitter|facebook|vimeo).*?\/', 'i');
