@@ -4,7 +4,7 @@
  * @description YouTube & Tumblr & Twitter & Facebook 视频下载器
  */
 
-let version = '2.0.1', link = '', keyword = '', rootView = '', rootWeb = '', platform = '';
+let version = '2.1.2', link = '', keyword = '', rootView = '', rootWeb = '', platform = '';
 
 link = $detector.link($context.text).map(link => {
     if (/youtu(\.?be)?|tumblr|twitter|facebook|vimeo/i.test(link))
