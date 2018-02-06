@@ -35,9 +35,9 @@ function initCanvas () {
 }
 
 function initVideoEvents () {
-    Vue.nextTick(function(){
-        vm.$refs.v.addEventListener('play', () => { vm.video.play = true; }, false);
-        vm.$refs.v.addEventListener('pause', () => { vm.video.play = false; }, false);
+    Vue.nextTick(function () {
+        vm.$refs.v.addEventListener('play', () => vm.video.playing = true, false);
+        vm.$refs.v.addEventListener('pause', () => vm.video.playing = false, false);
     });
 }
 
@@ -61,7 +61,10 @@ window.onload = () => {
         },
         watch: {
             video (val) {
-                if (val) initVideoEvents();
+                if (val && val !== '') {
+                    this.$set(vm.video, 'touch', false);
+                    initVideoEvents();
+                }
             },
             platform (val) {
                 if (val !== '') initCanvas();
@@ -73,6 +76,13 @@ window.onload = () => {
             },
             convertVideo (v) {
                 $notify('exec', {func: 'convertYouTubeVideo', params: v});
+            },
+            fadeInVideo () {
+                if (this.video.playing) return;
+                this.$nextTick(() => {
+                    vm.$refs.v.addEventListener('play', () => vm.video.playing = true, false);
+                    vm.$refs.v.addEventListener('pause', () => vm.video.playing = false, false);
+                });
             }
         }
     });

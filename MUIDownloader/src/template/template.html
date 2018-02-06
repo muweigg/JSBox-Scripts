@@ -43,10 +43,10 @@
                             <video controls
                                 ref="v"
                                 :poster="video.poster"
-                                :class="{ playing: video.play }"
+                                :class="{ playing: video.playing || video.touch }"
                                 :style="{ width: vw + 'px', height: vh + 'px' }"
-                                @touchstart="video.play = true;"
-                                @touchend="video.play = false;"
+                                @touchstart="video.touch = true;"
+                                @touchend="video.touch = false;"
                                 >
                                 <source :src="video.url" :type="'video/' + video.type">
                             </video>

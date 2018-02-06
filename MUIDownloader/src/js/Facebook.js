@@ -58,7 +58,7 @@ async function analysisFacebookVideoByLink () {
                         poster: poster,
                         url: url,
                         type: 'mp4',
-                        play: false,
+                        playing: false,
                         download: download
                     };
                     
@@ -67,6 +67,8 @@ async function analysisFacebookVideoByLink () {
                     $ui.loading(false);
                     $ui.toast('解析完成');
                 } catch (e) {
+                    $device.taptic(0);
+                    $ui.loading(false);
                     $ui.alert({
                         title: "解析失败",
                         message: "无法获取视频信息",

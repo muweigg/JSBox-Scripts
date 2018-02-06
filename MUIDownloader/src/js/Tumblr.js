@@ -9,7 +9,7 @@ function analysisTumblrVideoByLink () {
                 title: '',
                 url: '',
                 type: 'mp4',
-                play: false,
+                playing: false,
                 download: [],
             }
             const img = document.querySelector('#videoContainer img');

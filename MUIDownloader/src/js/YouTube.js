@@ -15,45 +15,54 @@ async function analysisYouTubeVideoByLink () {
             form: { curID: id, url: link },
             timeout: 30,
             handler (resp) {
-                let tempData = Object.assign({}, resp.data);
+                try {
+                    let tempData = Object.assign({}, resp.data);
 
-                if (!tempData.download && !tempData.downloadf) {
-                    $ui.alert({
-                        title: "解析错误",
-                        message: "直播不能下载及转换",
-                    });
-                    $ui.loading(false);
-                    return;
-                }
+                    if (!tempData.download && !tempData.downloadf) {
+                        $ui.alert({
+                            title: "解析错误",
+                            message: "直播不能下载及转换",
+                        });
+                        $ui.loading(false);
+                        return;
+                    }
 
-                let video = Object.assign({}, tempData.download.filter(v => {
-                    v.title = tempData.info.title;
-                    return v.type === 'mp4';
-                })[0]);
+                    let video = Object.assign({}, tempData.download.filter(v => {
+                        v.title = tempData.info.title;
+                        return v.type === 'mp4';
+                    })[0]);
 
-                video.poster = tempData.thumb[tempData.thumb.length - 1];
-                video.play = false;
+                    video.poster = tempData.thumb[tempData.thumb.length - 1];
+                    video.playing = false;
 
-                video.download = tempData.download.map(v => {
-                    v.title = tempData.info.title;
-                    v.saveName = `${v.title}-${id}-${v.quality}.${v.type}`;
-                    return v;
-                });
-
-                if (tempData.downloadf instanceof Array) {
-                    video.downloadf = tempData.downloadf.map(v => {
-                        v.urlexec = tempData.urlexec;
-                        v.id = id;
-                        v.token = tempData.token;
+                    video.download = tempData.download.map(v => {
                         v.title = tempData.info.title;
                         v.saveName = `${v.title}-${id}-${v.quality}.${v.type}`;
                         return v;
                     });
-                }
 
-                resolve(video);
-                $ui.loading(false);
-                $device.taptic(0);
+                    if (tempData.downloadf instanceof Array) {
+                        video.downloadf = tempData.downloadf.map(v => {
+                            v.urlexec = tempData.urlexec;
+                            v.id = id;
+                            v.token = tempData.token;
+                            v.title = tempData.info.title;
+                            v.saveName = `${v.title}-${id}-${v.quality}.${v.type}`;
+                            return v;
+                        });
+                    }
+
+                    resolve(video);
+                    $ui.loading(false);
+                    $device.taptic(0);
+                } catch (e) {
+                    $device.taptic(0);
+                    $ui.loading(false);
+                    $ui.alert({
+                        title: "解析失败",
+                        message: "无法获取视频信息",
+                    });
+                }
             }
         })
     });

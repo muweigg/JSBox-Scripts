@@ -66,7 +66,7 @@ async function analysisTwitterVideoByLink () {
                             title: title,
                             url: download[0].url,
                             type: download[0].type,
-                            play: false,
+                            playing: false,
                             download: download
                         };
     
@@ -76,6 +76,8 @@ async function analysisTwitterVideoByLink () {
                         $ui.toast('解析完成');
                         $('twitter_web').remove();
                     } catch (e) {
+                        $device.taptic(0);
+                        $ui.loading(false);
                         $ui.alert({
                             title: "解析失败",
                             message: "无法获取视频信息",
