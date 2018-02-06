@@ -4,10 +4,10 @@
  * @description YouTube & Tumblr & Twitter & Facebook 视频下载器
  */
 
-let version = '2.2.3', link = '', keyword = '', rootView = '', rootWeb = '', platform = '';
+let version = '2.3.3', link = '', keyword = '', rootView = '', rootWeb = '', platform = '';
 
 link = $detector.link($context.text).map(link => {
-    if (/youtu(\.?be)?|tumblr|twitter|facebook|vimeo|vine/i.test(link))
+    if (/youtu(\.?be)?|tumblr|twitter|facebook|vimeo|vine|aol/i.test(link))
         return link;
 });
 
@@ -22,7 +22,7 @@ if (!link) {
 }
 
 function checkSupport() {
-    const regex = new RegExp('https?:\/\/.*?(youtu(\.?be)?|tumblr|twitter|facebook|vimeo|vine).*?\/', 'i');
+    const regex = new RegExp('https?:\/\/.*?(youtu(\.?be)?|tumblr|twitter|facebook|vimeo|vine|aol).*?\/', 'i');
     let support = false;
 
     if (regex.test(link)) support = true;
@@ -96,6 +96,7 @@ async function ready() {
         facebook: analysisFacebookVideoByLink,
         vimeo: analysisVimeoVideoByLink,
         vine: analysisVimeoVideoByLink,
+        aol: analysisVimeoVideoByLink,
     };
 
     let video = await analysis[platform]();
@@ -107,7 +108,7 @@ async function ready() {
 if (!checkSupport()) {
     $ui.alert({
         title: "暂不支持",
-        message: "目前只支持：YouTube & Tumblr & Twitter & Facebook & Vimeo & Vine",
+        message: "目前只支持：YouTube & Tumblr & Twitter & Facebook & Vimeo & Vine & Aol",
     });
     return;
 }

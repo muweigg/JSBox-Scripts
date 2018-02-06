@@ -11,7 +11,7 @@ async function analysisVimeoVideoByLink () {
             handler: function(resp) {
                 try {
                     const data = resp.data;
-                    const download = data.urls.map(v => {
+                    let download = data.urls.map(v => {
                         let label = v.label.split('-');
                         v.title = data.title;
                         v.url = v.id;
@@ -21,6 +21,8 @@ async function analysisVimeoVideoByLink () {
                         return v;
                     });
 
+                    download = download.filter(v => v.type === 'mp4');
+                    
                     const video = {
                         poster: data.thumbnail,
                         title: data.title,
