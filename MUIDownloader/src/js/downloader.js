@@ -4,10 +4,10 @@
  * @description YouTube & Tumblr & Twitter & Facebook 视频下载器
  */
 
-let version = '2.4.5', link = '', keyword = '', rootView = '', rootWeb = '', platform = '';
+let version = '2.6.5', link = '', keyword = '', rootView = '', rootWeb = '', platform = '';
 
 link = $detector.link($context.text).map(link => {
-    if (/youtu(\.?be)?|tumblr|twitter|facebook|vimeo|vine|aol|dailymotion/i.test(link))
+    if (/youtu(\.?be)?|tumblr|twitter|facebook|vimeo|vine|aol|dailymotion|youku|mgtv/i.test(link))
         return link;
 });
 
@@ -22,7 +22,7 @@ if (!link) {
 }
 
 function checkSupport() {
-    const regex = new RegExp('https?:\/\/.*?(youtu(\.?be)?|tumblr|twitter|facebook|vimeo|vine|aol|dailymotion).*?\/', 'i');
+    const regex = new RegExp('https?:\/\/.*?(youtu(\.?be)?|tumblr|twitter|facebook|vimeo|vine|aol|dailymotion|youku|mgtv).*?\/', 'i');
     let support = false;
 
     if (regex.test(link)) support = true;
@@ -98,6 +98,8 @@ async function ready() {
         vine: analysisVimeoVideoByLink,
         aol: analysisVimeoVideoByLink,
         dailymotion: analysisVimeoVideoByLink,
+        youku: analysisVimeoVideoByLink,
+        mgtv: analysisVimeoVideoByLink,
     };
 
     let video = await analysis[platform]();
@@ -109,7 +111,7 @@ async function ready() {
 if (!checkSupport()) {
     $ui.alert({
         title: "暂不支持",
-        message: "目前只支持：YouTube & Tumblr & Twitter & Facebook & Vimeo & Vine & Aol & dailymotion",
+        message: "目前只支持：YouTube & Tumblr & Twitter & Facebook & Vimeo & Vine & Aol & dailymotion & 优酷 & 芒果TV",
     });
     return;
 }
