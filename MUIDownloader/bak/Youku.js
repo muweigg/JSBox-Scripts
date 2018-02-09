@@ -44,7 +44,6 @@ async function analysisYoukuVideoByLink () {
 
     return new Promise(async (resolve) => {
         const data = await getData();
-        $console.info(JSON.stringify(data, null, 2));
 
         const download = data.qualities.map(v => {
             v.title = data.title;
