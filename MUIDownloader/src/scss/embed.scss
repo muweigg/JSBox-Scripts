@@ -186,6 +186,21 @@ body {
                                         // background-color: #00B0FF;
                                         background-color: rgba(0,176,255,.5);
                                     }
+
+                                    &.m4a {
+                                        // background-color: #2979FF;
+                                        background-color: rgba(41,121,255,.5);
+                                    }
+
+                                    &.m3u8 {
+                                        // background-color: #B71C1C;
+                                        background-color: rgba(183,28,28,.5);
+                                    }
+
+                                    &.ogg {
+                                        // background-color: #424242;
+                                        background-color: rgba(66,66,66,.5);
+                                    }
                                 }
                             }
                         }

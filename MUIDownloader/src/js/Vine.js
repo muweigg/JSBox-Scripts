@@ -1,4 +1,4 @@
-async function analysisYouTubeVideoByLink () {
+async function analysisVineVideoByLink () {
     const HOST = 'https://www.1010diy.com';
 
     $ui.loading(true);
@@ -12,10 +12,10 @@ async function analysisYouTubeVideoByLink () {
                 try {
                     const result = resp.data.result;
 
-                    const download = result.videos.reverse().map(v => {
+                    const download = result.data.formats.reverse().map(v => {
                         v.title = result.data.title;
-                        v.quality = v.formatNote;
-                        v.type = v.ext;
+                        v.quality = v.format_id;
+                        v.type = /m3u8/.test(v.protocol) ? 'm3u8' : v.ext;
                         v.saveName = `${v.title}-${v.quality}.${v.type}`;
                         return v;
                     });
@@ -47,36 +47,6 @@ async function analysisYouTubeVideoByLink () {
                         video.sections.push({
                             title: 'Audio:',
                             download: audios
-                        });
-                    }
-
-                    if (result.onlyVideos.length > 0) {
-                        const onlyVideos = result.onlyVideos.reverse().map(v => {
-                            v.title = result.data.title;
-                            v.quality = v.formatNote;
-                            v.type = v.ext;
-                            v.saveName = `${v.title}-${v.quality}.${v.type}`;
-                            return v;
-                        });
-
-                        video.sections.push({
-                            title: 'Only Video:',
-                            download: onlyVideos
-                        });
-                    }
-
-                    if (result.onlyAudios.length > 0) {
-                        const onlyAudios = result.onlyAudios.reverse().map(a => {
-                            a.title = result.data.title;
-                            a.quality = a.formatNote;
-                            a.type = a.ext;
-                            a.saveName = `${a.title}-${a.quality}.${a.type}`;
-                            return a;
-                        });
-
-                        video.sections.push({
-                            title: 'Only Audio:',
-                            download: onlyAudios
                         });
                     }
 

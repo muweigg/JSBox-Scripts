@@ -48,7 +48,7 @@
                                 @touchstart="video.touch = true;"
                                 @touchend="video.touch = false;"
                                 >
-                                <source :src="video.url" :type="'video/' + video.type">
+                                <source :src="video.url" :type="'video/' + video.type === 'm3u8' ? 'mp4' : video.type">
                             </video>
                         </template>
                     </transition>
@@ -56,16 +56,9 @@
                         {{ video ? video.title : '' }}
                     </div>
                     <div class="download-list">
-                        <section v-if="video.download">
-                            <header>Video + Audio:</header>
-                            <div v-for="v in video.download" @click="download(v);">
-                                {{ v.quality && v.quality !== '' ? v.quality : v.title }}
-                                <span :class="classes[v.type]">{{v.type}}</span>
-                            </div>
-                        </section>
-                        <section v-if="video.downloadf">
-                            <header>High Quality: (Merge Audio online)</header>
-                            <div v-for="v in video.downloadf" @click="convertVideo(v);">
+                        <section v-if="video.sections" v-for="s in video.sections">
+                            <header>{{s.title}}</header>
+                            <div v-for="v in s.download" @click="download(v);">
                                 {{ v.quality && v.quality !== '' ? v.quality : v.title }}
                                 <span :class="classes[v.type]">{{v.type}}</span>
                             </div>

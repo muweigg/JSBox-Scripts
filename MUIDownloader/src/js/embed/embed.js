@@ -32,6 +32,9 @@ const classes = {
     'mp4': 'mp4',
     'webm': 'webm',
     '3gp': 'v3gp',
+    'm4a': 'm4a',
+    'm3u8': 'm3u8',
+    'ogg': 'ogg',
 };
 
 function initCanvas () {

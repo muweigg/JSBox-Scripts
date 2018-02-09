@@ -10,7 +10,12 @@ function analysisTumblrVideoByLink () {
                 url: '',
                 type: 'mp4',
                 playing: false,
-                download: [],
+                sections: [
+                    {
+                        title: 'Video + Audio:',
+                        download: []
+                    }
+                ]
             }
             const img = document.querySelector('#videoContainer img');
             const atags = document.querySelectorAll('#videoDownload a');
@@ -24,7 +29,7 @@ function analysisTumblrVideoByLink () {
 
                     if (str.length > 1) quality = str[1];
                     
-                    data.download.push({
+                    data.sections[0].download.push({
                         title: title,
                         url: url,
                         type: 'mp4',
@@ -34,7 +39,7 @@ function analysisTumblrVideoByLink () {
                 }
             }
             if (img.src != '') data.poster = img.src;
-            let v = data.download[data.download.length - 1];
+            let v = data.sections[0].download[data.sections[0].download.length - 1];
             data.url = v.url;
             data.title = v.title;
             $notify('processData', data);

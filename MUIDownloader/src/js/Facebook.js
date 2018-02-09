@@ -59,7 +59,12 @@ async function analysisFacebookVideoByLink () {
                         url: url,
                         type: 'mp4',
                         playing: false,
-                        download: download
+                        sections: [
+                            {
+                                title: 'Video + Audio:',
+                                download: download
+                            }
+                        ]
                     };
                     
                     resolve(video);

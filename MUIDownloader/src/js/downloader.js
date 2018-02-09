@@ -95,10 +95,10 @@ async function ready() {
         twitter: analysisTwitterVideoByLink,
         facebook: analysisFacebookVideoByLink,
         vimeo: analysisVimeoVideoByLink,
-        vine: analysisVimeoVideoByLink,
-        aol: analysisVimeoVideoByLink,
-        dailymotion: analysisVimeoVideoByLink,
-        youku: analysisVimeoVideoByLink,
+        vine: analysisVineVideoByLink,
+        aol: analysisAolVideoByLink,
+        dailymotion: analysisDailymotionVideoByLink,
+        youku: analysisYoukuVideoByLink,
         mgtv: analysisVimeoVideoByLink,
     };
 

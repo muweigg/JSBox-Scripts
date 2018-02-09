@@ -67,7 +67,12 @@ async function analysisTwitterVideoByLink () {
                             url: download[0].url,
                             type: download[0].type,
                             playing: false,
-                            download: download
+                            sections: [
+                                {
+                                    title: 'Video + Audio:',
+                                    download: download
+                                }
+                            ]
                         };
     
                         resolve(video);
