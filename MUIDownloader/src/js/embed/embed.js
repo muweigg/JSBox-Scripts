@@ -21,8 +21,8 @@ const base64Icons = {
     'vine': Vine,
     'aol': Aol,
     'dailymotion': Dailymotion,
-    'youku': Youku,
-    'mgtv': Mgtv,
+    // 'youku': Youku,
+    // 'mgtv': Mgtv,
 };
 
 let vm = null;
