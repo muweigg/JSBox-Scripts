@@ -61,9 +61,6 @@ function initUI () {
                         const func = eval(`${data.func}`);
                         if (data.params) func(data.params);
                         else func();
-                    },
-                    debug (data) {
-                        $console.info(data);
                     }
                 }
             }
@@ -90,13 +87,13 @@ async function ready() {
     rootWeb.eval({ script: `vm.link = '${link}'; vm.platform = '${platform}';` });
 
     const analysis = {
-        youtube: analysisYouTubeVideoByLink,
-        tumblr: analysisTumblrVideoByLink,
-        twitter: analysisTwitterVideoByLink,
-        facebook: analysisFacebookVideoByLink,
-        vimeo: analysisVimeoVideoByLink,
-        vine: analysisVineVideoByLink,
-        aol: analysisAolVideoByLink,
+        youtube    : analysisYouTubeVideoByLink,
+        tumblr     : analysisTumblrVideoByLink,
+        twitter    : analysisTwitterVideoByLink,
+        facebook   : analysisFacebookVideoByLink,
+        vimeo      : analysisVimeoVideoByLink,
+        vine       : analysisVineVideoByLink,
+        aol        : analysisAolVideoByLink,
         dailymotion: analysisDailymotionVideoByLink,
     };
 
