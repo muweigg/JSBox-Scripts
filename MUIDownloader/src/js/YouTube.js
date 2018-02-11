@@ -253,13 +253,6 @@ async function analysisYouTubeVideoByLink () {
                 try {
                     const data = resp.data;
 
-                    if (!data.status) {
-                        $ui.alert({
-                            title: "解析失败",
-                            message: "无法解析正在直播的视频或者视频包含保护内容",
-                        });
-                    }
-
                     const result = data.result, VAs = [], Vs = [], As = [], V3Ds = [];
 
                     for (let key in result) {
@@ -356,7 +349,7 @@ async function analysisYouTubeVideoByLink () {
                     $ui.loading(false);
                     $ui.alert({
                         title: "解析失败",
-                        message: "无法获取视频信息",
+                        message: "无法解析正在直播或者视频内包含受保护内容的视频",
                     });
                 }
             }
