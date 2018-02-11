@@ -53,20 +53,40 @@ async function analysisYouTubeVideoByLink () {
             },
         },
         VDict = {
+            315: {
+                wh: '3840 x 2160',
+                format: '2160p60',
+                ext: 'webm',
+            },
             313: {
-                wh: '1920 x 1080',
-                format: '1080p',
+                wh: '* x 2160',
+                format: '2160p',
+                ext: 'webm',
+            },
+            308: {
+                wh: '176 x 1440',
+                format: '1440p60',
                 ext: 'webm',
             },
             303: {
                 wh: '1920 x 1080',
-                format: '1080p60fps',
+                format: '1080p60',
                 ext: 'webm',
             },
             302: {
-                wh: '1280 x 720',
-                format: '720p60fps',
+                wh: '1280 x 2160',
+                format: '2160p60',
                 ext: 'webm',
+            },
+            299: {
+                wh: '1920 x 1080',
+                format: '1080p60',
+                ext: 'mp4',
+            },
+            298: {
+                wh: '1280 x 720',
+                format: '720p60',
+                ext: 'mp4',
             },
             278: {
                 wh: '256 x 144',
@@ -82,6 +102,16 @@ async function analysisYouTubeVideoByLink () {
                 wh: '2560 x 1440',
                 format: '1440p',
                 ext: 'webm',
+            },
+            266: {
+                wh: '* x 2160',
+                format: '2160p60',
+                ext: 'mp4',
+            },
+            264: {
+                wh: '176 x 1440',
+                format: '1440p',
+                ext: 'mp4',
             },
             248: {
                 wh: '1920 x 1080',
@@ -117,6 +147,36 @@ async function analysisYouTubeVideoByLink () {
                 wh: '320 x 240',
                 format: '240p',
                 ext: 'webm',
+            },
+            219: {
+                wh: '* x 144',
+                format: '144p',
+                ext: 'webm',
+            },
+            218: {
+                wh: '854 x 480',
+                format: '480p',
+                ext: 'webm',
+            },
+            170: {
+                wh: '1920 x 1080',
+                format: '1080p',
+                ext: 'mp4',
+            },
+            169: {
+                wh: '1280 x 720',
+                format: '720p',
+                ext: 'mp4',
+            },
+            168: {
+                wh: '854 x 480',
+                format: '480p',
+                ext: 'mp4',
+            },
+            167: {
+                wh: '640 x 360',
+                format: '360p',
+                ext: 'mp4',
             },
             160: {
                 wh: '256 x 144',
