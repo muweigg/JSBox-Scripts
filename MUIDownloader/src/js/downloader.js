@@ -4,7 +4,7 @@
  * @description YouTube & Tumblr & Twitter & Facebook & Vimeo & Vine & Aol & Dailymotion 视频下载器
  */
 
-let version = '2.6.6', link = '', keyword = '', rootView = '', rootWeb = '', platform = '';
+let link = '', keyword = '', rootView = '', rootWeb = '', platform = '';
 
 link = $detector.link($context.text).map(link => {
     if (/youtu(\.?be)?|tumblr|twitter|facebook|vimeo|vine|aol|dailymotion|youku|mgtv/i.test(link))
@@ -76,6 +76,7 @@ function downloadVideo (data) {
     $http.download({
         url: data.url,
         handler: function(resp) {
+            rootWeb.eval({ script: `vm.downloading = false;` });
             $device.taptic(0);
             $share.sheet([data.saveName, resp.data]);
         }

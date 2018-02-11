@@ -60,6 +60,7 @@ gulp.task('build:template', gulp.series(gulp.parallel('embed:vendors', 'embed:js
 
 gulp.task('build',
     () => gulp.src([
+            './src/js/Update.js',
             './src/js/downloader.js',
             './src/js/*.js',
         ])

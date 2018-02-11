@@ -1,82 +1,349 @@
 async function analysisYouTubeVideoByLink () {
-    const HOST = 'https://www.1010diy.com';
+    const parseHost = 'https://api.youtubemultidownloader.com/video',
+        VADict = {
+            46: {
+                wh: '1920 x 1080',
+                format: '1080p',
+                ext: 'webm',
+            },
+            45: {
+                wh: '1280 x 720',
+                format: '720p',
+                ext: 'webm',
+            },
+            44: {
+                wh: '854 x 480',
+                format: '480p',
+                ext: 'webm',
+            },
+            43: {
+                wh: '640 x 360',
+                format: '360p',
+                ext: 'webm',
+            },
+            38: {
+                wh: '4096 x 3072',
+                format: '3072p',
+                ext: 'mp4',
+            },
+            37: {
+                wh: '1920 x 1080',
+                format: '1080p',
+                ext: 'mp4',
+            },
+            36: {
+                wh: '320 x 240',
+                format: '240p',
+                ext: '3gp',
+            },
+            22: {
+                wh: '1280 x 720',
+                format: '720p',
+                ext: 'mp4',
+            },
+            18: {
+                wh: '640 x 360',
+                format: '360p',
+                ext: 'mp4',
+            },
+            17: {
+                wh: '176 x 144',
+                format: '144p',
+                ext: '3gp',
+            },
+        },
+        VDict = {
+            313: {
+                wh: '1920 x 1080',
+                format: '1080p',
+                ext: 'webm',
+            },
+            303: {
+                wh: '1920 x 1080',
+                format: '1080p60fps',
+                ext: 'webm',
+            },
+            302: {
+                wh: '1280 x 720',
+                format: '720p60fps',
+                ext: 'webm',
+            },
+            278: {
+                wh: '256 x 144',
+                format: '144p',
+                ext: 'webm',
+            },
+            272: {
+                wh: '3840 x 2160',
+                format: '2160p',
+                ext: 'webm',
+            },
+            271: {
+                wh: '2560 x 1440',
+                format: '1440p',
+                ext: 'webm',
+            },
+            248: {
+                wh: '1920 x 1080',
+                format: '1080p',
+                ext: 'webm',
+            },
+            247: {
+                wh: '1280 x 720',
+                format: '720p',
+                ext: 'webm',
+            },
+            246: {
+                wh: '640 x 480',
+                format: '480p',
+                ext: 'webm',
+            },
+            245: {
+                wh: '640 x 480',
+                format: '480p',
+                ext: 'webm',
+            },
+            244: {
+                wh: '640 x 480',
+                format: '480p',
+                ext: 'webm',
+            },
+            243: {
+                wh: '480 x 360',
+                format: '360p',
+                ext: 'webm',
+            },
+            242: {
+                wh: '320 x 240',
+                format: '240p',
+                ext: 'webm',
+            },
+            160: {
+                wh: '256 x 144',
+                format: '144p',
+                ext: 'mp4',
+            },
+            137: {
+                wh: '1920 x 1080',
+                format: '1080p',
+                ext: 'mp4',
+            },
+            136: {
+                wh: '1280 x 720',
+                format: '720p',
+                ext: 'mp4',
+            },
+            135: {
+                wh: '640 x 480',
+                format: '480p',
+                ext: 'mp4',
+            },
+            134: {
+                wh: '480 x 360',
+                format: '360p',
+                ext: 'mp4',
+            },
+            133: {
+                wh: '320 x 240',
+                format: '240p',
+                ext: 'mp4',
+            },
+        },
+        ADict = {
+            251: {
+                wh: '',
+                format: '48.0 KHz 160 Kbps',
+                ext: 'webm',
+            },
+            250: {
+                wh: '',
+                format: '48.0 KHz 70 Kbps',
+                ext: 'webm',
+            },
+            249: {
+                wh: '',
+                format: '48.0 KHz 50 Kbps',
+                ext: 'webm',
+            },
+            172: {
+                wh: '',
+                format: '44.1 KHz 256 Kbps',
+                ext: 'webm',
+            },
+            171: {
+                wh: '',
+                format: '44.1 KHz 128 Kbps',
+                ext: 'webm',
+            },
+            141: {
+                wh: '',
+                format: '44.1 KHz 256 Kbps',
+                ext: 'm4a',
+            },
+            140: {
+                wh: '',
+                format: '44.1 KHz 128 Kbps',
+                ext: 'm4a',
+            },
+            139: {
+                wh: '',
+                format: '44.1 KHz 48 Kbps',
+                ext: 'm4a',
+            },
+        },
+        V3DDict = {
+            102: {
+                wh: '1280 x 720',
+                format: '720p',
+                ext: 'webm',
+            },
+            101: {
+                wh: '640 x 480',
+                format: '480p',
+                ext: 'webm',
+            },
+            100: {
+                wh: '480 x 360',
+                format: '360p',
+                ext: 'webm',
+            },
+            85: {
+                wh: '1920 x 1080',
+                format: '1080p',
+                ext: 'mp4',
+            },
+            84: {
+                wh: '1280 x 720',
+                format: '720p',
+                ext: 'mp4',
+            },
+            83: {
+                wh: '640 x 480',
+                format: '480p',
+                ext: 'mp4',
+            },
+            82: {
+                wh: '480 x 360',
+                format: '360p',
+                ext: 'mp4',
+            },
+        };
+
+    let id = link.match(/(v=|\/.*?be\/)(.*?)(&|$)/)[2];
 
     $ui.loading(true);
     $ui.toast(`解析地址`);
 
+    function sortBy (attr, rev = true) {
+        let r = rev ? -1 : 1;
+        return function(a, b) {
+            a = parseInt(a[attr]);
+            b = parseInt(b[attr]);
+            // if(a < b) return r * -1;
+            // if(a > b) return r * 1;
+            return (a - b) * r;
+        }
+    }
+
     return new Promise(resolve => {
         $http.get({
-            url: `${HOST}/free-mp3-finder/detail?url=${encodeURI(link)}&_=${Date.now()}`,
+            url: `${parseHost}?id=${id}`,
             timeout: 30,
             handler: async (resp) => {
                 try {
-                    const result = resp.data.result;
+                    const data = resp.data;
 
-                    const download = result.videos.reverse().map(v => {
-                        v.title = result.data.title;
-                        v.quality = v.formatNote;
-                        v.type = v.ext;
-                        v.saveName = `${v.title}-${v.quality}.${v.type}`;
-                        return v;
-                    });
+                    if (!data.status) {
+                        $ui.alert({
+                            title: "解析失败",
+                            message: "无法解析正在直播的视频或者视频包含保护内容",
+                        });
+                    }
 
-                    const video = {
-                        poster: result.data.thumbnail,
-                        title: result.data.title,
-                        url: download[0].url,
-                        type: download[0].type,
+                    const result = data.result, VAs = [], Vs = [], As = [], V3Ds = [];
+
+                    for (let key in result) {
+                        if (VADict[key]) {
+                            let f = VADict[key];
+                            VAs.push({
+                                title: data.title,
+                                quality: f.format,
+                                type: f.ext,
+                                url: result[key],
+                                saveName: `${data.title}-${f.format}.${f.ext}`
+                            });
+                        }
+
+                        if (VDict[key]) {
+                            let f = VDict[key];
+                            Vs.push({
+                                title: data.title,
+                                quality: f.format,
+                                type: f.ext,
+                                url: result[key],
+                                saveName: `${data.title}-${f.format}.${f.ext}`
+                            });
+                        }
+
+                        if (ADict[key]) {
+                            let f = ADict[key];
+                            As.push({
+                                title: data.title,
+                                quality: f.format,
+                                type: f.ext,
+                                url: result[key],
+                                saveName: `${data.title}-${f.format}.${f.ext}`
+                            });
+                        }
+
+                        if (V3DDict[key]) {
+                            let f = V3DDict[key];
+                            V3Ds.push({
+                                title: data.title,
+                                quality: f.format,
+                                type: f.ext,
+                                url: result[key],
+                                saveName: `${data.title}-${f.format}.${f.ext}`
+                            });
+                        }
+                    }
+
+                    VAs.sort(sortBy('quality'));
+                    Vs.sort(sortBy('quality'));
+                    V3Ds.sort(sortBy('quality'));
+
+                    let video = {
+                        title: data.title,
+                        poster: `https://img.youtube.com/vi/${id}/hqdefault.jpg`,
+                        url: VAs[0].url,
+                        type: VAs[0].type,
                         playing: false,
                         sections: [
                             {
                                 title: 'Video + Audio:',
-                                download: download
+                                download: VAs
                             }
                         ]
-                    }
+                    };
 
-                    if (result.audios.length > 0) {
-                        const audios = result.audios.map(a => {
-                            a.title = result.data.title;
-                            a.quality = a.formatNote;
-                            a.type = a.ext;
-                            a.url = `${HOST}${a.url}`;
-                            a.saveName = `${a.title}-${a.quality}.${a.type}`;
-                            return a;
-                        });
-
-                        video.sections.push({
-                            title: 'Audio:',
-                            download: audios
-                        });
-                    }
-
-                    if (result.onlyVideos.length > 0) {
-                        const onlyVideos = result.onlyVideos.reverse().map(v => {
-                            v.title = result.data.title;
-                            v.quality = v.formatNote;
-                            v.type = v.ext;
-                            v.saveName = `${v.title}-${v.quality}.${v.type}`;
-                            return v;
-                        });
-
+                    if (Vs.length > 0) {
                         video.sections.push({
                             title: 'Only Video:',
-                            download: onlyVideos
+                            download: Vs
                         });
                     }
 
-                    if (result.onlyAudios.length > 0) {
-                        const onlyAudios = result.onlyAudios.reverse().map(a => {
-                            a.title = result.data.title;
-                            a.quality = a.formatNote;
-                            a.type = a.ext;
-                            a.saveName = `${a.title}-${a.quality}.${a.type}`;
-                            return a;
-                        });
-
+                    if (As.length > 0) {
                         video.sections.push({
                             title: 'Only Audio:',
-                            download: onlyAudios
+                            download: As.sort().reverse()
+                        });
+                    }
+
+                    if (V3Ds.length > 0) {
+                        video.sections.push({
+                            title: '3D:',
+                            download: V3Ds
                         });
                     }
 

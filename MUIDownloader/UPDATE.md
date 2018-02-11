@@ -1,4 +1,4 @@
 {
-    "message": "更换接口和修复 Bug，并由于接口混乱，暂时取消 优酷 & 芒果TV 支持\nSupport:\nYouTube & Tumblr & Twitter & Facebook & Vimeo & Vine & Aol & Dailymotion",
-    "version": "2.6.6"
+    "message": "更换 YouTube & Facebook 视频获取方式，暂不支持 Facebook 私有视频下载。\nSupport:\nYouTube & Tumblr & Twitter & Facebook & Vimeo & Vine & Aol & Dailymotion",
+    "version": "2.6.8"
 }

@@ -1,3 +1,5 @@
+let version = '2.6.8';
+
 async function checkUpdate () {
     const checkVersionURL = 'https://raw.githubusercontent.com/muweigg/JSBox-Scripts/master/MUIDownloader/README.md',
         messageURL = 'https://raw.githubusercontent.com/muweigg/JSBox-Scripts/master/MUIDownloader/UPDATE.md',

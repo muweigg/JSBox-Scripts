@@ -46,9 +46,8 @@
                             @touchend="video.touch = false;">
                             <img v-if="video.poster != ''" :src="video.poster">
                             <template>
-                                <video controls ref="v"
-                                    :poster="video.poster">
-                                    <source :src="video.url" :type="'video/' + video.type === 'm3u8' ? 'mp4' : video.type">
+                                <video controls ref="v" :poster="video.poster">
+                                    <source :src="video.url" :type="'video/' + (video.type == 'm3u8' ? 'mp4' : video.type)">
                                 </video>
                             </template>
                         </div>
